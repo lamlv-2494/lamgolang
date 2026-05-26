@@ -6,38 +6,59 @@ import (
 )
 
 var (
-	AlgorithmMismatch = errors.New("Algorithm mismatch")
-	InvalidToken      = errors.New("Invalid token")
-	CantGetClaims     = errors.New("Can't get claims")
+	UserNotFound     = errors.New("user not found")
+	CategoryNotFound = errors.New("category not found")
 
-	UserNotFound       = errors.New("user not found")
-	InvalidPassword    = errors.New("Invalid email or password")
-	CreateUserFailed   = errors.New("Failed to create user")
-	GenerateTokenFail  = errors.New("Failed to generate token")
-	EmailOrUserTaken   = errors.New("Email or Username has already been taken")
-	UsernameTaken      = errors.New("Username has already been taken")
-	EmailTaken         = errors.New("Email has already been taken")
+	InvalidPassword = errors.New("Invalid email or password")
+
+	EmailOrUserTaken = errors.New("Email or Username has already been taken")
+	UsernameTaken    = errors.New("Username has already been taken")
+	EmailTaken       = errors.New("Email has already been taken")
+
+	CreateUserFailed     = errors.New("Failed to create user")
+	GenerateTokenFail    = errors.New("Failed to generate token")
+	UpdateUserFailed     = errors.New("Failed to update user")
+	CreateCategoryFailed = errors.New("failed to create category")
+	UpdateCategoryFailed = errors.New("failed to update category")
+	DeleteCategoryFailed = errors.New("failed to delete category")
+
+	InvalidToken       = errors.New("Invalid token")
 	MissingAuthHeader  = errors.New("Authorization header is required")
 	InvalidTokenFormat = errors.New("Invalid token format")
-	AccessDenied       = errors.New("Access denied. Admin role required.")
-	UpdateUserFailed   = errors.New("Failed to update user")
+	AlgorithmMismatch  = errors.New("Algorithm mismatch")
+	CantGetClaims      = errors.New("Can't get claims")
+
+	AccessDenied = errors.New("Access denied. Admin role required.")
+
+	CategoryAlreadyExists = errors.New("category already exists")
 )
 
 var errorStatusMap = map[error]int{
-	UserNotFound:       http.StatusNotFound,
-	InvalidPassword:    http.StatusUnauthorized,
-	EmailOrUserTaken:   http.StatusUnprocessableEntity,
-	UsernameTaken:      http.StatusUnprocessableEntity,
-	EmailTaken:         http.StatusUnprocessableEntity,
-	CreateUserFailed:   http.StatusInternalServerError,
-	GenerateTokenFail:  http.StatusInternalServerError,
-	UpdateUserFailed:   http.StatusInternalServerError,
+	UserNotFound:     http.StatusNotFound,
+	CategoryNotFound: http.StatusNotFound,
+
+	InvalidPassword: http.StatusUnauthorized,
+
+	EmailOrUserTaken: http.StatusUnprocessableEntity,
+	UsernameTaken:    http.StatusUnprocessableEntity,
+	EmailTaken:       http.StatusUnprocessableEntity,
+
+	CreateUserFailed:     http.StatusInternalServerError,
+	GenerateTokenFail:    http.StatusInternalServerError,
+	UpdateUserFailed:     http.StatusInternalServerError,
+	CreateCategoryFailed: http.StatusInternalServerError,
+	UpdateCategoryFailed: http.StatusInternalServerError,
+	DeleteCategoryFailed: http.StatusInternalServerError,
+
 	InvalidToken:       http.StatusUnauthorized,
 	MissingAuthHeader:  http.StatusUnauthorized,
 	InvalidTokenFormat: http.StatusUnauthorized,
-	AccessDenied:       http.StatusForbidden,
 	AlgorithmMismatch:  http.StatusUnauthorized,
 	CantGetClaims:      http.StatusUnauthorized,
+
+	AccessDenied: http.StatusForbidden,
+
+	CategoryAlreadyExists: http.StatusConflict,
 }
 
 func GetStatusCodeAndMessage(err error) (int, string) {

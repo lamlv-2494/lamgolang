@@ -22,14 +22,20 @@ func main() {
 	db := configs.ConnectDB()
 
 	userRepo := repositories.NewUserRepository(db)
+	categoryRepo := repositories.NewCategoryRepository(db)
+
 	userService := services.NewUserService(userRepo)
+	categoryService := services.NewCategoryService(categoryRepo)
+
 	userHandlers := handlers.NewUserHandler(userService)
+	categoryHandler := handlers.NewCategoryHandler(categoryService)
 
 	r := gin.Default()
 
 	api := r.Group("/api")
 	{
 		routes.RegisterUserGroup(api, userHandlers)
+		routes.RegisterAdminRoutes(api, categoryHandler)
 	}
 
 	port := os.Getenv(constants.Port)

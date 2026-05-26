@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 
+	"golang.org/x/crypto/bcrypt"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -40,5 +41,33 @@ func ConnectDB() *gorm.DB {
 	}
 
 	log.Println("✅ Connect to MySQL success!")
+	seedAdmin(database)
 	return database
+}
+
+// seedAdmin checks if an admin user exists and creates one if not
+func seedAdmin(db *gorm.DB) {
+	var count int64
+	db.Model(&entities.User{}).Where("role = ?", constants.AdminRole).Count(&count)
+
+	if count == 0 {
+		hashedPassword, err := bcrypt.GenerateFromPassword([]byte("admin123456"), bcrypt.DefaultCost)
+		if err != nil {
+			log.Println("❌ Failed to hash default admin password:", err)
+			return
+		}
+
+		admin := entities.User{
+			Username: "admin",
+			Email:    "admin@fooddelivery.com",
+			Password: string(hashedPassword),
+			Role:     constants.AdminRole,
+		}
+
+		if err := db.Create(&admin).Error; err != nil {
+			log.Println("❌ Failed to seed default admin user:", err)
+		} else {
+			log.Println("👑 Seeded default admin account successfully! (Email: admin@fooddelivery.com | Pass: admin123456)")
+		}
+	}
 }
