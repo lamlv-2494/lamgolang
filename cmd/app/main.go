@@ -2,6 +2,10 @@ package main
 
 import (
 	"food_delivery/internal/configs"
+	"food_delivery/internal/handlers"
+	"food_delivery/internal/repositories"
+	"food_delivery/internal/routes"
+	"food_delivery/internal/services"
 	"food_delivery/internal/utils/constants"
 	"log"
 	"os"
@@ -15,9 +19,18 @@ func main() {
 		log.Printf("Can't found env file")
 	}
 
-	_ = configs.ConnectDB()
+	db := configs.ConnectDB()
+
+	userRepo := repositories.NewUserRepository(db)
+	userService := services.NewUserService(userRepo)
+	userHandlers := handlers.NewUserHandler(userService)
 
 	r := gin.Default()
+
+	api := r.Group("/api")
+	{
+		routes.RegisterUserGroup(api, userHandlers)
+	}
 
 	port := os.Getenv(constants.Port)
 	if port == "" {
