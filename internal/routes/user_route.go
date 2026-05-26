@@ -17,5 +17,6 @@ func RegisterUserGroup(api *gin.RouterGroup, userController *handlers.UserHandle
 	userStrict := api.Group("/user", middlewares.AuthMiddleware())
 	{
 		userStrict.GET("", userController.GetCurrentUser)
+		userStrict.PUT("", userController.UpdateUser)
 	}
 }

@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"food_delivery/internal/models/entities"
+
 	"gorm.io/gorm"
 )
 
@@ -10,6 +11,7 @@ type UserRepository interface {
 	FindByEmail(email string) (*entities.User, error)
 	FindByID(id uint) (*entities.User, error)
 	FindByUsername(username string) (*entities.User, error)
+	UpdateUser(user *entities.User) error
 }
 
 type userRepository struct {
@@ -44,4 +46,8 @@ func (u *userRepository) FindByUsername(username string) (*entities.User, error)
 		return nil, err
 	}
 	return &user, nil
+}
+
+func (u *userRepository) UpdateUser(user *entities.User) error {
+	return u.db.Save(user).Error
 }
