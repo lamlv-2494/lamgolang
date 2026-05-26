@@ -11,4 +11,6 @@ const (
 	UserRole      = "userRole"
 	AdminRole     = "admin"
 	Exp           = "exp"
+
+	IDParam = "id"
 )
