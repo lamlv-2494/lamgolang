@@ -67,3 +67,25 @@ func (uc *UserHandler) GetCurrentUser(ctx *gin.Context) {
 
 	ResponseSuccess(ctx, http.StatusOK, user)
 }
+
+func (uc *UserHandler) UpdateUser(ctx *gin.Context) {
+	userID, exists := ctx.Get(constants.UserID)
+	if !exists {
+		ResponseError(ctx, configs.UserNotFound)
+		return
+	}
+
+	var req requests.UpdateUserRequest
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ResponseError(ctx, err)
+		return
+	}
+
+	updatedUser, err := uc.userService.UpdateUser(userID.(uint), &req)
+	if err != nil {
+		ResponseError(ctx, err)
+		return
+	}
+
+	ResponseSuccess(ctx, http.StatusOK, updatedUser)
+}

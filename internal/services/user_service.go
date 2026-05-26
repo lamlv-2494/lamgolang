@@ -14,6 +14,7 @@ type UserService interface {
 	Register(req requests.RegisterRequest) (*responses.UserResponse, error)
 	Login(req requests.LoginRequest) (*responses.UserResponse, error)
 	GetCurrentUser(id uint) (*responses.UserResponse, error)
+	UpdateUser(id uint, req *requests.UpdateUserRequest) (*responses.UserResponse, error)
 }
 
 type userService struct {
@@ -99,6 +100,51 @@ func (u *userService) GetCurrentUser(id uint) (*responses.UserResponse, error) {
 	user, err := u.repo.FindByID(id)
 	if err != nil {
 		return nil, configs.UserNotFound
+	}
+
+	userResponse := &responses.UserResponse{
+		User: responses.UserData{
+			ID:       user.ID,
+			Email:    user.Email,
+			Username: user.Username,
+			Role:     user.Role,
+		},
+	}
+	return userResponse, nil
+}
+
+func (u *userService) UpdateUser(id uint, req *requests.UpdateUserRequest) (*responses.UserResponse, error) {
+	user, err := u.repo.FindByID(id)
+	if err != nil {
+		return nil, configs.UserNotFound
+	}
+
+	if req.User.Username != nil {
+		existingUser, err := u.repo.FindByUsername(*req.User.Username)
+		if err == nil && existingUser.ID != id {
+			return nil, configs.UsernameTaken
+		}
+		user.Username = *req.User.Username
+	}
+	if req.User.Email != nil {
+		existingUser, err := u.repo.FindByEmail(*req.User.Email)
+		if err == nil && existingUser.ID != id {
+			return nil, configs.EmailTaken
+		}
+		user.Email = *req.User.Email
+	}
+	if req.User.Password != nil {
+		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(*req.User.Password), bcrypt.DefaultCost)
+		if err != nil {
+			return nil, configs.UpdateUserFailed
+		}
+		if user.Password != string(hashedPassword) {
+			user.Password = string(hashedPassword)
+		}
+	}
+
+	if err := u.repo.UpdateUser(user); err != nil {
+		return nil, configs.UpdateUserFailed
 	}
 
 	userResponse := &responses.UserResponse{
