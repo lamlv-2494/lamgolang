@@ -43,6 +43,10 @@ func main() {
 
 	api := r.Group("/api")
 	{
+		api.GET("/categories", adminHandlers.CategoryHandler.GetCategories)
+		api.GET("/products", adminHandlers.ProductHandler.GetProducts)
+		api.GET("/products/:id", adminHandlers.ProductHandler.GetProductByID)
+
 		routes.RegisterUserGroup(api, userHandlers)
 		routes.RegisterAdminRoutes(api, adminHandlers)
 	}

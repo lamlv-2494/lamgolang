@@ -14,13 +14,8 @@ type AdminHandlers struct {
 }
 
 func RegisterAdminRoutes(api *gin.RouterGroup, adminHandlers *AdminHandlers) {
-
-	api.GET("/categories", adminHandlers.CategoryHandler.GetCategories)
-	api.GET("/products", adminHandlers.ProductHandler.GetProducts)
-
 	adminStrict := api.Group("/admin", middlewares.AuthMiddleware(), middlewares.AdminMiddleware())
 	{
-
 		// Manage Users
 		userGroup := adminStrict.Group("/users")
 		{
