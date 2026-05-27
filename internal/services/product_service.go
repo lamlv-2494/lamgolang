@@ -13,6 +13,8 @@ type ProductService interface {
 	UpdateProduct(id uint, req requests.UpdateProductRequest) (*responses.ProductData, error)
 	DeleteProduct(id uint) error
 	GetProducts(classify string, categoryID uint, minPrice, maxPrice float64, minRating float64, sort string) ([]*responses.ProductData, error)
+
+	GetProductByID(id uint) (*responses.ProductData, error)
 }
 
 type productService struct {
@@ -167,4 +169,36 @@ func (s *productService) GetProducts(classify string, categoryID uint, minPrice,
 	}
 
 	return productResponses, nil
+}
+
+func (s *productService) GetProductByID(id uint) (*responses.ProductData, error) {
+	product, err := s.productRepo.FindByID(id)
+	if err != nil {
+		return nil, configs.ProductNotFound
+	}
+
+	var totalStars int
+	var avgRating float64
+	if len(product.Ratings) > 0 {
+		for _, r := range product.Ratings {
+			totalStars += r.Stars
+		}
+		avgRating = float64(totalStars) / float64(len(product.Ratings))
+	}
+
+	productResponse := &responses.ProductData{
+		ID:          product.ID,
+		Name:        product.Name,
+		Description: product.Description,
+		Price:       product.Price,
+		Image:       product.Image,
+		CategoryID:  product.CategoryID,
+		Category: responses.CategoryCompact{
+			Name:        product.Category.Name,
+			Description: product.Category.Description,
+		},
+		Rating: avgRating,
+	}
+
+	return productResponse, nil
 }

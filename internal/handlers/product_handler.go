@@ -166,3 +166,20 @@ func (h *ProductHandler) GetProducts(ctx *gin.Context) {
 
 	ResponseSuccess(ctx, http.StatusOK, products)
 }
+
+func (h *ProductHandler) GetProductByID(ctx *gin.Context) {
+	idStr := ctx.Param(constants.IDParam)
+	id, err := strconv.ParseUint(idStr, 10, 64)
+	if err != nil {
+		ResponseError(ctx, err)
+		return
+	}
+
+	product, err := h.service.GetProductByID(uint(id))
+	if err != nil {
+		ResponseError(ctx, err)
+		return
+	}
+
+	ResponseSuccess(ctx, http.StatusOK, product)
+}
