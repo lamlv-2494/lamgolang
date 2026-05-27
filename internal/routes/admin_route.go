@@ -10,6 +10,7 @@ import (
 type AdminHandlers struct {
 	CategoryHandler *handlers.CategoryHandler
 	ProductHandler  *handlers.ProductHandler
+	UserHandler     *handlers.UserHandler
 }
 
 func RegisterAdminRoutes(api *gin.RouterGroup, adminHandlers *AdminHandlers) {
@@ -19,20 +20,29 @@ func RegisterAdminRoutes(api *gin.RouterGroup, adminHandlers *AdminHandlers) {
 
 	adminStrict := api.Group("/admin", middlewares.AuthMiddleware(), middlewares.AdminMiddleware())
 	{
-		// CRUD Categories
-		categorygroup := adminStrict.Group("/categories")
+
+		// Manage Users
+		userGroup := adminStrict.Group("/users")
 		{
-			categorygroup.POST("", adminHandlers.CategoryHandler.CreateCategory)
-			categorygroup.PUT("/:id", adminHandlers.CategoryHandler.UpdateCategory)
-			categorygroup.DELETE("/:id", adminHandlers.CategoryHandler.DeleteCategory)
+			userGroup.GET("", adminHandlers.UserHandler.GetAllUsers)
+			userGroup.PUT("/:id", adminHandlers.UserHandler.AdminUpdateUser)
+			userGroup.DELETE("/:id", adminHandlers.UserHandler.AdminDeleteUser)
 		}
 
-		// CRUD Products
-		productgroup := adminStrict.Group("/products")
+		// Manage Categories
+		categoryGroup := adminStrict.Group("/categories")
 		{
-			productgroup.POST("", adminHandlers.ProductHandler.CreateProduct)
-			productgroup.PUT("/:id", adminHandlers.ProductHandler.UpdateProduct)
-			productgroup.DELETE("/:id", adminHandlers.ProductHandler.DeleteProduct)
+			categoryGroup.POST("", adminHandlers.CategoryHandler.CreateCategory)
+			categoryGroup.PUT("/:id", adminHandlers.CategoryHandler.UpdateCategory)
+			categoryGroup.DELETE("/:id", adminHandlers.CategoryHandler.DeleteCategory)
+		}
+
+		// Manage Products
+		productGroup := adminStrict.Group("/products")
+		{
+			productGroup.POST("", adminHandlers.ProductHandler.CreateProduct)
+			productGroup.PUT("/:id", adminHandlers.ProductHandler.UpdateProduct)
+			productGroup.DELETE("/:id", adminHandlers.ProductHandler.DeleteProduct)
 		}
 	}
 }

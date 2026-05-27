@@ -15,6 +15,11 @@ type UserService interface {
 	Login(req requests.LoginRequest) (*responses.UserResponse, error)
 	GetCurrentUser(id uint) (*responses.UserResponse, error)
 	UpdateUser(id uint, req *requests.UpdateUserRequest) (*responses.UserResponse, error)
+
+	// Admin functions
+	GetAllUsers() ([]*responses.UserResponse, error)
+	AdminUpdateUser(targetID uint, req *requests.AdminUpdateUserRequest) (*responses.UserResponse, error)
+	AdminDeleteUser(targetID uint) error
 }
 
 type userService struct {
@@ -156,4 +161,79 @@ func (u *userService) UpdateUser(id uint, req *requests.UpdateUserRequest) (*res
 		},
 	}
 	return userResponse, nil
+}
+
+// Admin functions
+func (u *userService) GetAllUsers() ([]*responses.UserResponse, error) {
+	users, err := u.repo.FindAllUsers()
+	if err != nil {
+		return nil, configs.FetchUsersFailed
+	}
+
+	var userResponses []*responses.UserResponse
+	for _, user := range users {
+		userResponses = append(userResponses, &responses.UserResponse{
+			User: responses.UserData{
+				ID:       user.ID,
+				Email:    user.Email,
+				Username: user.Username,
+				Role:     user.Role,
+			},
+		})
+	}
+	return userResponses, nil
+}
+
+func (u *userService) AdminUpdateUser(targetID uint, req *requests.AdminUpdateUserRequest) (*responses.UserResponse, error) {
+	user, err := u.repo.FindByID(targetID)
+	if err != nil {
+		return nil, configs.UserNotFound
+	}
+
+	if req.User.Username != nil {
+		existingUser, err := u.repo.FindByUsername(*req.User.Username)
+		if err == nil && existingUser.ID != targetID {
+			return nil, configs.UsernameTaken
+		}
+		user.Username = *req.User.Username
+	}
+
+	if req.User.Email != nil {
+		existingUser, err := u.repo.FindByEmail(*req.User.Email)
+		if err == nil && existingUser.ID != targetID {
+			return nil, configs.EmailTaken
+		}
+		user.Email = *req.User.Email
+	}
+
+	if req.User.Role != nil {
+		user.Role = *req.User.Role
+	}
+
+	if err := u.repo.UpdateUser(user); err != nil {
+		return nil, configs.UpdateUserFailed
+	}
+
+	userResponse := &responses.UserResponse{
+		User: responses.UserData{
+			ID:       user.ID,
+			Email:    user.Email,
+			Username: user.Username,
+			Role:     user.Role,
+		},
+	}
+
+	return userResponse, nil
+}
+
+func (u *userService) AdminDeleteUser(targetID uint) error {
+	user, err := u.repo.FindByID(targetID)
+	if err != nil {
+		return configs.UserNotFound
+	}
+
+	if err := u.repo.DeleteUser(user); err != nil {
+		return configs.DeleteUserFailed
+	}
+	return nil
 }

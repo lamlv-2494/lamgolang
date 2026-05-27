@@ -7,6 +7,7 @@ import (
 	"food_delivery/internal/utils/constants"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -88,4 +89,60 @@ func (uc *UserHandler) UpdateUser(ctx *gin.Context) {
 	}
 
 	ResponseSuccess(ctx, http.StatusOK, updatedUser)
+}
+
+func (uc *UserHandler) GetAllUsers(ctx *gin.Context) {
+	users, err := uc.userService.GetAllUsers()
+	if err != nil {
+		ResponseError(ctx, err)
+		return
+	}
+
+	ResponseSuccess(ctx, http.StatusOK, users)
+}
+
+func (uc *UserHandler) AdminUpdateUser(ctx *gin.Context) {
+	targetID, err := getIDParam(ctx)
+	if err != nil {
+		ResponseError(ctx, err)
+		return
+	}
+
+	var req requests.AdminUpdateUserRequest
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ResponseError(ctx, err)
+		return
+	}
+
+	updatedUser, err := uc.userService.AdminUpdateUser(targetID, &req)
+	if err != nil {
+		ResponseError(ctx, err)
+		return
+	}
+
+	ResponseSuccess(ctx, http.StatusOK, updatedUser)
+}
+
+func (uc *UserHandler) AdminDeleteUser(ctx *gin.Context) {
+	targetID, err := getIDParam(ctx)
+	if err != nil {
+		ResponseError(ctx, err)
+		return
+	}
+
+	if err := uc.userService.AdminDeleteUser(targetID); err != nil {
+		ResponseError(ctx, err)
+		return
+	}
+
+	ResponseSuccess(ctx, http.StatusOK, gin.H{"message": "User deleted successfully"})
+}
+
+func getIDParam(ctx *gin.Context) (uint, error) {
+	idStr := ctx.Param(constants.IDParam)
+	id, err := strconv.ParseUint(idStr, 10, 64)
+	if err != nil {
+		return 0, err
+	}
+	return uint(id), nil
 }
