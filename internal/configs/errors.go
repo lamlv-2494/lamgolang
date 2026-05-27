@@ -8,6 +8,7 @@ import (
 var (
 	UserNotFound     = errors.New("user not found")
 	CategoryNotFound = errors.New("category not found")
+	ProductNotFound  = errors.New("product not found")
 
 	InvalidPassword = errors.New("Invalid email or password")
 
@@ -21,6 +22,9 @@ var (
 	CreateCategoryFailed = errors.New("failed to create category")
 	UpdateCategoryFailed = errors.New("failed to update category")
 	DeleteCategoryFailed = errors.New("failed to delete category")
+	CreateProductFailed  = errors.New("failed to create product")
+	UpdateProductFailed  = errors.New("failed to update product")
+	DeleteProductFailed  = errors.New("failed to delete product")
 
 	InvalidToken       = errors.New("Invalid token")
 	MissingAuthHeader  = errors.New("Authorization header is required")
@@ -36,6 +40,7 @@ var (
 var errorStatusMap = map[error]int{
 	UserNotFound:     http.StatusNotFound,
 	CategoryNotFound: http.StatusNotFound,
+	ProductNotFound:  http.StatusNotFound,
 
 	InvalidPassword: http.StatusUnauthorized,
 
@@ -49,6 +54,9 @@ var errorStatusMap = map[error]int{
 	CreateCategoryFailed: http.StatusInternalServerError,
 	UpdateCategoryFailed: http.StatusInternalServerError,
 	DeleteCategoryFailed: http.StatusInternalServerError,
+	CreateProductFailed:  http.StatusInternalServerError,
+	UpdateProductFailed:  http.StatusInternalServerError,
+	DeleteProductFailed:  http.StatusInternalServerError,
 
 	InvalidToken:       http.StatusUnauthorized,
 	MissingAuthHeader:  http.StatusUnauthorized,

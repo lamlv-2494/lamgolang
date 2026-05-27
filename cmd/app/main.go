@@ -23,19 +23,27 @@ func main() {
 
 	userRepo := repositories.NewUserRepository(db)
 	categoryRepo := repositories.NewCategoryRepository(db)
+	productRepo := repositories.NewProductRepository(db)
 
 	userService := services.NewUserService(userRepo)
 	categoryService := services.NewCategoryService(categoryRepo)
+	productService := services.NewProductService(productRepo, categoryRepo)
 
 	userHandlers := handlers.NewUserHandler(userService)
 	categoryHandler := handlers.NewCategoryHandler(categoryService)
+	productHandler := handlers.NewProductHandler(productService)
+
+	adminHandlers := &routes.AdminHandlers{
+		CategoryHandler: categoryHandler,
+		ProductHandler:  productHandler,
+	}
 
 	r := gin.Default()
 
 	api := r.Group("/api")
 	{
 		routes.RegisterUserGroup(api, userHandlers)
-		routes.RegisterAdminRoutes(api, categoryHandler)
+		routes.RegisterAdminRoutes(api, adminHandlers)
 	}
 
 	port := os.Getenv(constants.Port)

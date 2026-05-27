@@ -7,14 +7,32 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func RegisterAdminRoutes(api *gin.RouterGroup, categoryHandler *handlers.CategoryHandler) {
+type AdminHandlers struct {
+	CategoryHandler *handlers.CategoryHandler
+	ProductHandler  *handlers.ProductHandler
+}
 
-	api.GET("/categories", categoryHandler.GetCategories)
+func RegisterAdminRoutes(api *gin.RouterGroup, adminHandlers *AdminHandlers) {
+
+	api.GET("/categories", adminHandlers.CategoryHandler.GetCategories)
+	api.GET("/products", adminHandlers.ProductHandler.GetProducts)
 
 	adminStrict := api.Group("/admin", middlewares.AuthMiddleware(), middlewares.AdminMiddleware())
 	{
-		adminStrict.POST("/categories", categoryHandler.CreateCategory)
-		adminStrict.PUT("/categories/:id", categoryHandler.UpdateCategory)
-		adminStrict.DELETE("/categories/:id", categoryHandler.DeleteCategory)
+		// CRUD Categories
+		categorygroup := adminStrict.Group("/categories")
+		{
+			categorygroup.POST("", adminHandlers.CategoryHandler.CreateCategory)
+			categorygroup.PUT("/:id", adminHandlers.CategoryHandler.UpdateCategory)
+			categorygroup.DELETE("/:id", adminHandlers.CategoryHandler.DeleteCategory)
+		}
+
+		// CRUD Products
+		productgroup := adminStrict.Group("/products")
+		{
+			productgroup.POST("", adminHandlers.ProductHandler.CreateProduct)
+			productgroup.PUT("/:id", adminHandlers.ProductHandler.UpdateProduct)
+			productgroup.DELETE("/:id", adminHandlers.ProductHandler.DeleteProduct)
+		}
 	}
 }

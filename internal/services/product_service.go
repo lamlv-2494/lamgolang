@@ -1,0 +1,156 @@
+package services
+
+import (
+	"food_delivery/internal/configs"
+	"food_delivery/internal/models/dto/requests"
+	"food_delivery/internal/models/dto/responses"
+	"food_delivery/internal/models/entities"
+	"food_delivery/internal/repositories"
+)
+
+type ProductService interface {
+	CreateProduct(req requests.CreateProductRequest) (*responses.ProductData, error)
+	UpdateProduct(id uint, req requests.UpdateProductRequest) (*responses.ProductData, error)
+	DeleteProduct(id uint) error
+	GetProducts() ([]*responses.ProductData, error)
+}
+
+type productService struct {
+	productRepo  repositories.ProductRepository
+	categoryRepo repositories.CategoryRepository
+}
+
+func NewProductService(productRepo repositories.ProductRepository, categoryRepo repositories.CategoryRepository) ProductService {
+	return &productService{
+		productRepo:  productRepo,
+		categoryRepo: categoryRepo,
+	}
+}
+
+func (s *productService) CreateProduct(req requests.CreateProductRequest) (*responses.ProductData, error) {
+	// Kiểm tra xem danh mục món ăn truyền lên có tồn tại không
+	if _, err := s.categoryRepo.FindByID(req.CategoryID); err != nil {
+		return nil, configs.CategoryNotFound
+	}
+
+	product := &entities.Product{
+		Name:        req.Name,
+		Description: req.Description,
+		Price:       req.Price,
+		Image:       req.Image,
+		CategoryID:  req.CategoryID,
+	}
+
+	if err := s.productRepo.Create(product); err != nil {
+		return nil, configs.CreateProductFailed
+	}
+
+	newProduct, err := s.productRepo.FindByID(product.ID)
+	if err != nil {
+		return nil, configs.ProductNotFound
+	}
+
+	response := &responses.ProductData{
+		ID:          newProduct.ID,
+		Name:        newProduct.Name,
+		Description: newProduct.Description,
+		Price:       newProduct.Price,
+		Image:       newProduct.Image,
+		CategoryID:  newProduct.CategoryID,
+		Category: responses.CategoryCompact{
+			Name:        newProduct.Category.Name,
+			Description: newProduct.Category.Description,
+		},
+	}
+
+	return response, nil
+}
+
+func (s *productService) UpdateProduct(id uint, req requests.UpdateProductRequest) (*responses.ProductData, error) {
+	product, err := s.productRepo.FindByID(id)
+	if err != nil {
+		return nil, configs.ProductNotFound
+	}
+
+	if req.CategoryID != nil {
+		if _, err := s.categoryRepo.FindByID(*req.CategoryID); err != nil {
+			return nil, configs.CategoryNotFound
+		}
+		product.CategoryID = *req.CategoryID
+	}
+
+	if req.Name != nil {
+		product.Name = *req.Name
+	}
+	if req.Description != nil {
+		product.Description = *req.Description
+	}
+	if req.Price != nil {
+		product.Price = *req.Price
+	}
+	if req.Image != nil {
+		product.Image = *req.Image
+	}
+
+	if err := s.productRepo.Update(product); err != nil {
+		return nil, configs.UpdateProductFailed
+	}
+
+	newProduct, err := s.productRepo.FindByID(product.ID)
+	if err != nil {
+		return nil, configs.ProductNotFound
+	}
+
+	response := &responses.ProductData{
+		ID:          newProduct.ID,
+		Name:        newProduct.Name,
+		Description: newProduct.Description,
+		Price:       newProduct.Price,
+		Image:       newProduct.Image,
+		CategoryID:  newProduct.CategoryID,
+		Category: responses.CategoryCompact{
+			Name:        newProduct.Category.Name,
+			Description: newProduct.Category.Description,
+		},
+	}
+
+	return response, nil
+}
+
+func (s *productService) DeleteProduct(id uint) error {
+	product, err := s.productRepo.FindByID(id)
+	if err != nil {
+		return configs.ProductNotFound
+	}
+
+	if err := s.productRepo.Delete(product); err != nil {
+		return configs.DeleteProductFailed
+	}
+
+	return nil
+}
+
+func (s *productService) GetProducts() ([]*responses.ProductData, error) {
+	products, err := s.productRepo.List()
+	if err != nil {
+		return nil, configs.ProductNotFound
+	}
+
+	var productResponses []*responses.ProductData
+	for _, p := range products {
+		productResponses = append(productResponses, &responses.ProductData{
+			ID:          p.ID,
+			Name:        p.Name,
+			Description: p.Description,
+			Price:       p.Price,
+			Image:       p.Image,
+			CategoryID:  p.CategoryID,
+			Category: responses.CategoryCompact{
+				Name:        p.Category.Name,
+				Description: p.Category.Description,
+			},
+		})
+	}
+
+	return productResponses, nil
+}
