@@ -127,7 +127,38 @@ func (h *ProductHandler) DeleteProduct(ctx *gin.Context) {
 }
 
 func (h *ProductHandler) GetProducts(ctx *gin.Context) {
-	products, err := h.service.GetProducts()
+	classify := ctx.Query(constants.ClassifyParam)
+	sort := ctx.Query(constants.SortParam)
+
+	var categoryID uint
+	if idStr := ctx.Query(constants.CategoryIDParam); idStr != "" {
+		if id, err := strconv.ParseUint(idStr, 10, 64); err == nil {
+			categoryID = uint(id)
+		}
+	}
+
+	var minPrice float64
+	if minPriceStr := ctx.Query(constants.MinPriceParam); minPriceStr != "" {
+		if val, err := strconv.ParseFloat(minPriceStr, 64); err == nil {
+			minPrice = val
+		}
+	}
+
+	var maxPrice float64
+	if maxPriceStr := ctx.Query(constants.MaxPriceParam); maxPriceStr != "" {
+		if val, err := strconv.ParseFloat(maxPriceStr, 64); err == nil {
+			maxPrice = val
+		}
+	}
+
+	var minRating float64
+	if ratingStr := ctx.Query(constants.RatingParam); ratingStr != "" {
+		if val, err := strconv.ParseFloat(ratingStr, 64); err == nil {
+			minRating = val
+		}
+	}
+
+	products, err := h.service.GetProducts(classify, categoryID, minPrice, maxPrice, minRating, sort)
 	if err != nil {
 		ResponseError(ctx, err)
 		return

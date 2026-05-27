@@ -12,5 +12,11 @@ const (
 	AdminRole     = "admin"
 	Exp           = "exp"
 
-	IDParam = "id"
+	IDParam         = "id"
+	ClassifyParam   = "classify"
+	CategoryIDParam = "category_id"
+	MinPriceParam   = "min_price"
+	MaxPriceParam   = "max_price"
+	RatingParam     = "rating"
+	SortParam       = "sort"
 )
