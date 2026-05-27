@@ -12,7 +12,7 @@ type ProductService interface {
 	CreateProduct(req requests.CreateProductRequest) (*responses.ProductData, error)
 	UpdateProduct(id uint, req requests.UpdateProductRequest) (*responses.ProductData, error)
 	DeleteProduct(id uint) error
-	GetProducts() ([]*responses.ProductData, error)
+	GetProducts(classify string, categoryID uint, minPrice, maxPrice float64, minRating float64, sort string) ([]*responses.ProductData, error)
 }
 
 type productService struct {
@@ -130,14 +130,27 @@ func (s *productService) DeleteProduct(id uint) error {
 	return nil
 }
 
-func (s *productService) GetProducts() ([]*responses.ProductData, error) {
-	products, err := s.productRepo.List()
+func (s *productService) GetProducts(classify string, categoryID uint, minPrice, maxPrice float64, minRating float64, sort string) ([]*responses.ProductData, error) {
+	products, err := s.productRepo.List(classify, categoryID, minPrice, maxPrice, minRating, sort)
 	if err != nil {
 		return nil, configs.ProductNotFound
 	}
 
+	if len(products) == 0 {
+		return []*responses.ProductData{}, nil
+	}
+
 	var productResponses []*responses.ProductData
 	for _, p := range products {
+		var totalStars int
+		var avgRating float64
+		if len(p.Ratings) > 0 {
+			for _, r := range p.Ratings {
+				totalStars += r.Stars
+			}
+			avgRating = float64(totalStars) / float64(len(p.Ratings))
+		}
+
 		productResponses = append(productResponses, &responses.ProductData{
 			ID:          p.ID,
 			Name:        p.Name,
@@ -149,6 +162,7 @@ func (s *productService) GetProducts() ([]*responses.ProductData, error) {
 				Name:        p.Category.Name,
 				Description: p.Category.Description,
 			},
+			Rating: avgRating,
 		})
 	}
 

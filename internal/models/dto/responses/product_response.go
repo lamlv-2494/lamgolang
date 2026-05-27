@@ -15,4 +15,5 @@ type ProductData struct {
 	Image       string          `json:"image"`
 	CategoryID  uint            `json:"category_id"`
 	Category    CategoryCompact `json:"category"`
+	Rating      float64         `json:"rating"`
 }
