@@ -9,6 +9,7 @@ var (
 	UserNotFound     = errors.New("user not found")
 	CategoryNotFound = errors.New("category not found")
 	ProductNotFound  = errors.New("product not found")
+	CartItemNotFound = errors.New("cart item not found")
 
 	InvalidPassword = errors.New("Invalid email or password")
 
@@ -27,6 +28,9 @@ var (
 	DeleteProductFailed  = errors.New("failed to delete product")
 	FetchUsersFailed     = errors.New("failed to fetch users list")
 	DeleteUserFailed     = errors.New("failed to delete user")
+	AddToCartFailed      = errors.New("failed to add item to cart")
+	UpdateCartItemFailed = errors.New("failed to update cart item")
+	RemoveFromCartFailed = errors.New("failed to remove item from cart")
 
 	InvalidToken       = errors.New("Invalid token")
 	MissingAuthHeader  = errors.New("Authorization header is required")
@@ -43,6 +47,7 @@ var errorStatusMap = map[error]int{
 	UserNotFound:     http.StatusNotFound,
 	CategoryNotFound: http.StatusNotFound,
 	ProductNotFound:  http.StatusNotFound,
+	CartItemNotFound: http.StatusNotFound,
 
 	InvalidPassword: http.StatusUnauthorized,
 
@@ -61,6 +66,9 @@ var errorStatusMap = map[error]int{
 	DeleteProductFailed:  http.StatusInternalServerError,
 	FetchUsersFailed:     http.StatusInternalServerError,
 	DeleteUserFailed:     http.StatusInternalServerError,
+	AddToCartFailed:      http.StatusInternalServerError,
+	UpdateCartItemFailed: http.StatusInternalServerError,
+	RemoveFromCartFailed: http.StatusInternalServerError,
 
 	InvalidToken:       http.StatusUnauthorized,
 	MissingAuthHeader:  http.StatusUnauthorized,
