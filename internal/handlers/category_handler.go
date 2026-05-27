@@ -70,7 +70,7 @@ func (h *CategoryHandler) DeleteCategory(ctx *gin.Context) {
 		return
 	}
 
-	ResponseSuccess(ctx, http.StatusOK, "Category deleted successfully")
+	ResponseSuccess(ctx, http.StatusOK, gin.H{"message": "Category deleted successfully"})
 }
 
 func (h *CategoryHandler) GetCategories(ctx *gin.Context) {
