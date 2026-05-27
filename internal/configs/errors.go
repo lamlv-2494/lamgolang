@@ -25,6 +25,8 @@ var (
 	CreateProductFailed  = errors.New("failed to create product")
 	UpdateProductFailed  = errors.New("failed to update product")
 	DeleteProductFailed  = errors.New("failed to delete product")
+	FetchUsersFailed     = errors.New("failed to fetch users list")
+	DeleteUserFailed     = errors.New("failed to delete user")
 
 	InvalidToken       = errors.New("Invalid token")
 	MissingAuthHeader  = errors.New("Authorization header is required")
@@ -57,6 +59,8 @@ var errorStatusMap = map[error]int{
 	CreateProductFailed:  http.StatusInternalServerError,
 	UpdateProductFailed:  http.StatusInternalServerError,
 	DeleteProductFailed:  http.StatusInternalServerError,
+	FetchUsersFailed:     http.StatusInternalServerError,
+	DeleteUserFailed:     http.StatusInternalServerError,
 
 	InvalidToken:       http.StatusUnauthorized,
 	MissingAuthHeader:  http.StatusUnauthorized,

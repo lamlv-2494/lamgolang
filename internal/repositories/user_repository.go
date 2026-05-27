@@ -12,6 +12,8 @@ type UserRepository interface {
 	FindByID(id uint) (*entities.User, error)
 	FindByUsername(username string) (*entities.User, error)
 	UpdateUser(user *entities.User) error
+	FindAllUsers() ([]*entities.User, error)
+	DeleteUser(user *entities.User) error
 }
 
 type userRepository struct {
@@ -50,4 +52,16 @@ func (u *userRepository) FindByUsername(username string) (*entities.User, error)
 
 func (u *userRepository) UpdateUser(user *entities.User) error {
 	return u.db.Save(user).Error
+}
+
+func (u *userRepository) FindAllUsers() ([]*entities.User, error) {
+	var users []*entities.User
+	if err := u.db.Order("id DESC").Find(&users).Error; err != nil {
+		return nil, err
+	}
+	return users, nil
+}
+
+func (u *userRepository) DeleteUser(user *entities.User) error {
+	return u.db.Delete(user).Error
 }

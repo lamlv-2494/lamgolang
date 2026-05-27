@@ -36,6 +36,7 @@ func main() {
 	adminHandlers := &routes.AdminHandlers{
 		CategoryHandler: categoryHandler,
 		ProductHandler:  productHandler,
+		UserHandler:     userHandlers,
 	}
 
 	r := gin.Default()
