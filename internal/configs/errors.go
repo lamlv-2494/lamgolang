@@ -20,24 +20,26 @@ var (
 	UsernameTaken    = errors.New("Username has already been taken")
 	EmailTaken       = errors.New("Email has already been taken")
 
-	CreateUserFailed     = errors.New("Failed to create user")
-	GenerateTokenFail    = errors.New("Failed to generate token")
-	UpdateUserFailed     = errors.New("Failed to update user")
-	CreateCategoryFailed = errors.New("failed to create category")
-	UpdateCategoryFailed = errors.New("failed to update category")
-	DeleteCategoryFailed = errors.New("failed to delete category")
-	CreateProductFailed  = errors.New("failed to create product")
-	UpdateProductFailed  = errors.New("failed to update product")
-	DeleteProductFailed  = errors.New("failed to delete product")
-	FetchUsersFailed     = errors.New("failed to fetch users list")
-	DeleteUserFailed     = errors.New("failed to delete user")
-	AddToCartFailed      = errors.New("failed to add item to cart")
-	UpdateCartItemFailed = errors.New("failed to update cart item")
-	RemoveFromCartFailed = errors.New("failed to remove item from cart")
-	CreateOrderFailed    = errors.New("failed to create order")
-	FetchOrdersFailed    = errors.New("failed to fetch order history")
-	UpdateOrderFailed    = errors.New("failed to update order status")
-	CreateRatingFailed   = errors.New("failed to submit rating")
+	CreateUserFailed       = errors.New("Failed to create user")
+	GenerateTokenFail      = errors.New("Failed to generate token")
+	UpdateUserFailed       = errors.New("Failed to update user")
+	CreateCategoryFailed   = errors.New("failed to create category")
+	UpdateCategoryFailed   = errors.New("failed to update category")
+	DeleteCategoryFailed   = errors.New("failed to delete category")
+	CreateProductFailed    = errors.New("failed to create product")
+	UpdateProductFailed    = errors.New("failed to update product")
+	DeleteProductFailed    = errors.New("failed to delete product")
+	FetchUsersFailed       = errors.New("failed to fetch users list")
+	DeleteUserFailed       = errors.New("failed to delete user")
+	AddToCartFailed        = errors.New("failed to add item to cart")
+	UpdateCartItemFailed   = errors.New("failed to update cart item")
+	RemoveFromCartFailed   = errors.New("failed to remove item from cart")
+	CreateOrderFailed      = errors.New("failed to create order")
+	FetchOrdersFailed      = errors.New("failed to fetch order history")
+	UpdateOrderFailed      = errors.New("failed to update order status")
+	CreateRatingFailed     = errors.New("failed to submit rating")
+	CreateSuggestionFailed = errors.New("failed to submit suggestion")
+	FetchSuggestionsFailed = errors.New("failed to fetch suggestions")
 
 	InvalidToken       = errors.New("Invalid token")
 	MissingAuthHeader  = errors.New("Authorization header is required")
@@ -66,24 +68,26 @@ var errorStatusMap = map[error]int{
 	UsernameTaken:    http.StatusUnprocessableEntity,
 	EmailTaken:       http.StatusUnprocessableEntity,
 
-	CreateUserFailed:     http.StatusInternalServerError,
-	GenerateTokenFail:    http.StatusInternalServerError,
-	UpdateUserFailed:     http.StatusInternalServerError,
-	CreateCategoryFailed: http.StatusInternalServerError,
-	UpdateCategoryFailed: http.StatusInternalServerError,
-	DeleteCategoryFailed: http.StatusInternalServerError,
-	CreateProductFailed:  http.StatusInternalServerError,
-	UpdateProductFailed:  http.StatusInternalServerError,
-	DeleteProductFailed:  http.StatusInternalServerError,
-	FetchUsersFailed:     http.StatusInternalServerError,
-	DeleteUserFailed:     http.StatusInternalServerError,
-	AddToCartFailed:      http.StatusInternalServerError,
-	UpdateCartItemFailed: http.StatusInternalServerError,
-	RemoveFromCartFailed: http.StatusInternalServerError,
-	CreateOrderFailed:    http.StatusInternalServerError,
-	FetchOrdersFailed:    http.StatusInternalServerError,
-	UpdateOrderFailed:    http.StatusInternalServerError,
-	CreateRatingFailed:   http.StatusInternalServerError,
+	CreateUserFailed:       http.StatusInternalServerError,
+	GenerateTokenFail:      http.StatusInternalServerError,
+	UpdateUserFailed:       http.StatusInternalServerError,
+	CreateCategoryFailed:   http.StatusInternalServerError,
+	UpdateCategoryFailed:   http.StatusInternalServerError,
+	DeleteCategoryFailed:   http.StatusInternalServerError,
+	CreateProductFailed:    http.StatusInternalServerError,
+	UpdateProductFailed:    http.StatusInternalServerError,
+	DeleteProductFailed:    http.StatusInternalServerError,
+	FetchUsersFailed:       http.StatusInternalServerError,
+	DeleteUserFailed:       http.StatusInternalServerError,
+	AddToCartFailed:        http.StatusInternalServerError,
+	UpdateCartItemFailed:   http.StatusInternalServerError,
+	RemoveFromCartFailed:   http.StatusInternalServerError,
+	CreateOrderFailed:      http.StatusInternalServerError,
+	FetchOrdersFailed:      http.StatusInternalServerError,
+	UpdateOrderFailed:      http.StatusInternalServerError,
+	CreateRatingFailed:     http.StatusInternalServerError,
+	CreateSuggestionFailed: http.StatusInternalServerError,
+	FetchSuggestionsFailed: http.StatusInternalServerError,
 
 	InvalidToken:       http.StatusUnauthorized,
 	MissingAuthHeader:  http.StatusUnauthorized,
