@@ -2,6 +2,7 @@ package services
 
 import (
 	"food_delivery/internal/configs"
+	"food_delivery/internal/models/dto/requests"
 	"food_delivery/internal/models/dto/responses"
 	"food_delivery/internal/models/entities"
 	"food_delivery/internal/repositories"
@@ -9,6 +10,11 @@ import (
 
 type OrderService interface {
 	Checkout(userID uint) (*responses.OrderResponse, error)
+
+	GetOrderHistory(userID uint) ([]*responses.OrderResponse, error)
+
+	AdminGetAllOrders() ([]*responses.OrderResponse, error)
+	AdminUpdateOrderStatus(orderID uint, req requests.UpdateOrderStatusRequest) (*responses.OrderResponse, error)
 }
 
 type orderService struct {
@@ -55,12 +61,12 @@ func (s *orderService) Checkout(userID uint) (*responses.OrderResponse, error) {
 
 	var responseItems []responses.OrderItemData
 	for i, item := range cartItems {
-		savedOrderItem := order.OrderItems[i] // Lấy đúng ID vừa được DB cấp
+		savedOrderItem := order.OrderItems[i]
 
 		responseItems = append(responseItems, responses.OrderItemData{
-			ID:        savedOrderItem.ID, // ID xịn của OrderItem
+			ID:        savedOrderItem.ID,
 			ProductID: item.ProductID,
-			Name:      item.Product.Name, // Tên lấy từ CartItem Preload
+			Name:      item.Product.Name,
 			Quantity:  savedOrderItem.Quantity,
 			Price:     savedOrderItem.Price,
 			SubTotal:  savedOrderItem.Price * float64(savedOrderItem.Quantity),
@@ -74,4 +80,69 @@ func (s *orderService) Checkout(userID uint) (*responses.OrderResponse, error) {
 		CreatedAt:  order.CreatedAt,
 		Items:      responseItems,
 	}, nil
+}
+
+func (s *orderService) GetOrderHistory(userID uint) ([]*responses.OrderResponse, error) {
+	orders, err := s.orderRepo.ListByUserID(userID)
+	if err != nil {
+		return nil, configs.FetchOrdersFailed
+	}
+
+	return s.mapOrdersToResponse(orders), nil
+}
+
+func (s *orderService) AdminGetAllOrders() ([]*responses.OrderResponse, error) {
+	orders, err := s.orderRepo.ListAll()
+	if err != nil {
+		return nil, configs.FetchOrdersFailed
+	}
+
+	return s.mapOrdersToResponse(orders), nil
+}
+
+func (s *orderService) mapOrdersToResponse(orders []*entities.Order) []*responses.OrderResponse {
+	var result []*responses.OrderResponse = make([]*responses.OrderResponse, 0)
+	for _, order := range orders {
+		var responseItems []responses.OrderItemData
+		for _, item := range order.OrderItems {
+			responseItems = append(responseItems, responses.OrderItemData{
+				ID:        item.ID,
+				ProductID: item.ProductID,
+				Name:      item.Product.Name,
+				Quantity:  item.Quantity,
+				Price:     item.Price,
+				SubTotal:  item.Price * float64(item.Quantity),
+			})
+		}
+		result = append(result, &responses.OrderResponse{
+			ID:         order.ID,
+			TotalPrice: order.TotalPrice,
+			Status:     order.Status,
+			CreatedAt:  order.CreatedAt,
+			Items:      responseItems,
+		})
+	}
+	return result
+}
+
+func (s *orderService) AdminUpdateOrderStatus(orderID uint, req requests.UpdateOrderStatusRequest) (*responses.OrderResponse, error) {
+	order, err := s.orderRepo.FindByOrderID(orderID)
+	if err != nil {
+		return nil, configs.OrderNotFound
+	}
+
+	// only accept valid status values
+	validStatuses := map[string]bool{
+		"pending": true, "processing": true, "delivering": true, "completed": true, "cancelled": true,
+	}
+	if !validStatuses[req.Status] {
+		return nil, configs.InvalidOrderStatus
+	}
+
+	order.Status = req.Status
+	if err := s.orderRepo.Update(order); err != nil {
+		return nil, configs.UpdateOrderFailed
+	}
+
+	return s.mapOrdersToResponse([]*entities.Order{order})[0], nil
 }

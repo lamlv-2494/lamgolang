@@ -7,7 +7,6 @@ import (
 	"food_delivery/internal/utils/constants"
 	"log"
 	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -102,7 +101,7 @@ func (uc *UserHandler) GetAllUsers(ctx *gin.Context) {
 }
 
 func (uc *UserHandler) AdminUpdateUser(ctx *gin.Context) {
-	targetID, err := getIDParam(ctx)
+	targetID, err := GetIDParam(ctx)
 	if err != nil {
 		ResponseError(ctx, err)
 		return
@@ -124,7 +123,7 @@ func (uc *UserHandler) AdminUpdateUser(ctx *gin.Context) {
 }
 
 func (uc *UserHandler) AdminDeleteUser(ctx *gin.Context) {
-	targetID, err := getIDParam(ctx)
+	targetID, err := GetIDParam(ctx)
 	if err != nil {
 		ResponseError(ctx, err)
 		return
@@ -136,13 +135,4 @@ func (uc *UserHandler) AdminDeleteUser(ctx *gin.Context) {
 	}
 
 	ResponseSuccess(ctx, http.StatusOK, gin.H{"message": "User deleted successfully"})
-}
-
-func getIDParam(ctx *gin.Context) (uint, error) {
-	idStr := ctx.Param(constants.IDParam)
-	id, err := strconv.ParseUint(idStr, 10, 64)
-	if err != nil {
-		return 0, err
-	}
-	return uint(id), nil
 }

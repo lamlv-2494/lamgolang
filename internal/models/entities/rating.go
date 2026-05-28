@@ -7,7 +7,7 @@ type Rating struct {
 	UserID    uint      `gorm:"not null" json:"user_id"`
 	User      User      `gorm:"foreignKey:UserID" json:"user"`
 	ProductID uint      `gorm:"not null" json:"product_id"`
-	Stars     int       `gorm:"not null" json:"stars"` // Từ 1 -> 5 sao
+	Stars     int       `gorm:"not null" json:"stars"` // from 1 -> 5 stars
 	Comment   string    `gorm:"type:text" json:"comment"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`

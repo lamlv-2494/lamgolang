@@ -12,7 +12,8 @@ var (
 	CartItemNotFound = errors.New("cart item not found")
 	OrderNotFound    = errors.New("order not found")
 
-	InvalidPassword = errors.New("Invalid email or password")
+	InvalidPassword    = errors.New("Invalid email or password")
+	InvalidOrderStatus = errors.New("invalid order status")
 
 	EmailOrUserTaken = errors.New("Email or Username has already been taken")
 	UsernameTaken    = errors.New("Username has already been taken")
@@ -33,6 +34,8 @@ var (
 	UpdateCartItemFailed = errors.New("failed to update cart item")
 	RemoveFromCartFailed = errors.New("failed to remove item from cart")
 	CreateOrderFailed    = errors.New("failed to create order")
+	FetchOrdersFailed    = errors.New("failed to fetch order history")
+	UpdateOrderFailed    = errors.New("failed to update order status")
 
 	InvalidToken       = errors.New("Invalid token")
 	MissingAuthHeader  = errors.New("Authorization header is required")
@@ -54,7 +57,8 @@ var errorStatusMap = map[error]int{
 	CartItemNotFound: http.StatusNotFound,
 	OrderNotFound:    http.StatusNotFound,
 
-	InvalidPassword: http.StatusUnauthorized,
+	InvalidPassword:    http.StatusUnauthorized,
+	InvalidOrderStatus: http.StatusBadRequest,
 
 	EmailOrUserTaken: http.StatusUnprocessableEntity,
 	UsernameTaken:    http.StatusUnprocessableEntity,
@@ -75,6 +79,8 @@ var errorStatusMap = map[error]int{
 	UpdateCartItemFailed: http.StatusInternalServerError,
 	RemoveFromCartFailed: http.StatusInternalServerError,
 	CreateOrderFailed:    http.StatusInternalServerError,
+	FetchOrdersFailed:    http.StatusInternalServerError,
+	UpdateOrderFailed:    http.StatusInternalServerError,
 
 	InvalidToken:       http.StatusUnauthorized,
 	MissingAuthHeader:  http.StatusUnauthorized,

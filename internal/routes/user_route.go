@@ -22,19 +22,19 @@ func RegisterUserGroup(api *gin.RouterGroup, userController *handlers.UserHandle
 }
 
 func RegisterCartRoutes(api *gin.RouterGroup, cartHandler *handlers.CartHandler) {
-	// Bọc toàn bộ cụm quản lý giỏ hàng qua bộ lọc Token
 	cartGroup := api.Group("/cart", middlewares.AuthMiddleware())
 	{
-		cartGroup.GET("", cartHandler.GetCart)               // Xem giỏ hàng
-		cartGroup.POST("", cartHandler.AddToCart)            // Thêm món vào giỏ
-		cartGroup.PUT("/:id", cartHandler.UpdateCartItem)    // Tăng giảm số lượng
-		cartGroup.DELETE("/:id", cartHandler.RemoveFromCart) // Xoá món khỏi giỏ
+		cartGroup.GET("", cartHandler.GetCart)
+		cartGroup.POST("", cartHandler.AddToCart)
+		cartGroup.PUT("/:id", cartHandler.UpdateCartItem)
+		cartGroup.DELETE("/:id", cartHandler.RemoveFromCart)
 	}
 }
 
 func RegisterOrderRoutes(api *gin.RouterGroup, orderHandler *handlers.OrderHandler) {
 	orderGroup := api.Group("/orders", middlewares.AuthMiddleware())
 	{
-		orderGroup.POST("", orderHandler.Checkout) // API Đặt hàng (Checkout)
+		orderGroup.POST("", orderHandler.Checkout)
+		orderGroup.GET("", orderHandler.GetOrderHistory)
 	}
 }

@@ -40,6 +40,7 @@ func main() {
 	orderHandler := handlers.NewOrderHandler(orderService)
 
 	adminHandlers := &routes.AdminHandlers{
+		OrderHandler:    orderHandler,
 		CategoryHandler: categoryHandler,
 		ProductHandler:  productHandler,
 		UserHandler:     userHandlers,
@@ -49,14 +50,18 @@ func main() {
 
 	api := r.Group("/api")
 	{
+		// Common
 		api.GET("/categories", adminHandlers.CategoryHandler.GetCategories)
 		api.GET("/products", adminHandlers.ProductHandler.GetProducts)
 		api.GET("/products/:id", adminHandlers.ProductHandler.GetProductByID)
 
+		// User
 		routes.RegisterUserGroup(api, userHandlers)
-		routes.RegisterAdminRoutes(api, adminHandlers)
 		routes.RegisterCartRoutes(api, cartHandler)
 		routes.RegisterOrderRoutes(api, orderHandler)
+
+		// Admin
+		routes.RegisterAdminRoutes(api, adminHandlers)
 	}
 
 	port := os.Getenv(constants.Port)

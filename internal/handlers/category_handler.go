@@ -3,9 +3,7 @@ package handlers
 import (
 	"food_delivery/internal/models/dto/requests"
 	"food_delivery/internal/services"
-	"food_delivery/internal/utils/constants"
 	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -35,8 +33,7 @@ func (h *CategoryHandler) CreateCategory(ctx *gin.Context) {
 }
 
 func (h *CategoryHandler) UpdateCategory(ctx *gin.Context) {
-	idStr := ctx.Param(constants.IDParam)
-	id, err := strconv.ParseUint(idStr, 10, 64)
+	id, err := GetIDParam(ctx)
 	if err != nil {
 		ResponseError(ctx, err)
 		return
@@ -58,8 +55,7 @@ func (h *CategoryHandler) UpdateCategory(ctx *gin.Context) {
 }
 
 func (h *CategoryHandler) DeleteCategory(ctx *gin.Context) {
-	idStr := ctx.Param(constants.IDParam)
-	id, err := strconv.ParseUint(idStr, 10, 64)
+	id, err := GetIDParam(ctx)
 	if err != nil {
 		ResponseError(ctx, err)
 		return
