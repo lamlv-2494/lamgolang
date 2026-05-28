@@ -53,7 +53,7 @@ func (r *cartRepository) Delete(item *entities.CartItem) error {
 
 func (r *cartRepository) ListByUserID(userID uint) ([]*entities.CartItem, error) {
 	var items []*entities.CartItem
-	if err := r.db.Where("user_id = ?", userID).Find(&items).Error; err != nil {
+	if err := r.db.Preload("Product").Where("user_id = ?", userID).Find(&items).Error; err != nil {
 		return nil, err
 	}
 	return items, nil

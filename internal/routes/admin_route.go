@@ -8,6 +8,7 @@ import (
 )
 
 type AdminHandlers struct {
+	OrderHandler    *handlers.OrderHandler
 	CategoryHandler *handlers.CategoryHandler
 	ProductHandler  *handlers.ProductHandler
 	UserHandler     *handlers.UserHandler
@@ -38,6 +39,12 @@ func RegisterAdminRoutes(api *gin.RouterGroup, adminHandlers *AdminHandlers) {
 			productGroup.POST("", adminHandlers.ProductHandler.CreateProduct)
 			productGroup.PUT("/:id", adminHandlers.ProductHandler.UpdateProduct)
 			productGroup.DELETE("/:id", adminHandlers.ProductHandler.DeleteProduct)
+		}
+
+		orderGroup := adminStrict.Group("/orders")
+		{
+			orderGroup.GET("", adminHandlers.OrderHandler.AdminGetAllOrders)
+			orderGroup.PUT("/:id/status", adminHandlers.OrderHandler.AdminUpdateOrderStatus)
 		}
 	}
 }

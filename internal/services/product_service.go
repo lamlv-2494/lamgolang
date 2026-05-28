@@ -30,7 +30,6 @@ func NewProductService(productRepo repositories.ProductRepository, categoryRepo 
 }
 
 func (s *productService) CreateProduct(req requests.CreateProductRequest) (*responses.ProductData, error) {
-	// Kiểm tra xem danh mục món ăn truyền lên có tồn tại không
 	if _, err := s.categoryRepo.FindByID(req.CategoryID); err != nil {
 		return nil, configs.CategoryNotFound
 	}

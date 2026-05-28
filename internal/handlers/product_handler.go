@@ -65,8 +65,7 @@ func (h *ProductHandler) CreateProduct(ctx *gin.Context) {
 }
 
 func (h *ProductHandler) UpdateProduct(ctx *gin.Context) {
-	idStr := ctx.Param(constants.IDParam)
-	id, err := strconv.ParseUint(idStr, 10, 64)
+	id, err := GetIDParam(ctx)
 	if err != nil {
 		ResponseError(ctx, err)
 		return
@@ -111,8 +110,7 @@ func (h *ProductHandler) UpdateProduct(ctx *gin.Context) {
 }
 
 func (h *ProductHandler) DeleteProduct(ctx *gin.Context) {
-	idStr := ctx.Param(constants.IDParam)
-	id, err := strconv.ParseUint(idStr, 10, 64)
+	id, err := GetIDParam(ctx)
 	if err != nil {
 		ResponseError(ctx, err)
 		return
@@ -168,8 +166,7 @@ func (h *ProductHandler) GetProducts(ctx *gin.Context) {
 }
 
 func (h *ProductHandler) GetProductByID(ctx *gin.Context) {
-	idStr := ctx.Param(constants.IDParam)
-	id, err := strconv.ParseUint(idStr, 10, 64)
+	id, err := GetIDParam(ctx)
 	if err != nil {
 		ResponseError(ctx, err)
 		return

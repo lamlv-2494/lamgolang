@@ -5,7 +5,6 @@ import (
 	"food_delivery/internal/services"
 	"food_delivery/internal/utils/constants"
 	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -55,8 +54,7 @@ func (h *CartHandler) GetCart(ctx *gin.Context) {
 func (h *CartHandler) UpdateCartItem(ctx *gin.Context) {
 	userID := ctx.MustGet(constants.UserID).(uint)
 
-	idStr := ctx.Param(constants.IDParam)
-	itemID, err := strconv.ParseUint(idStr, 10, 64)
+	itemID, err := GetIDParam(ctx)
 	if err != nil {
 		ResponseError(ctx, err)
 		return
@@ -79,8 +77,7 @@ func (h *CartHandler) UpdateCartItem(ctx *gin.Context) {
 func (h *CartHandler) RemoveFromCart(ctx *gin.Context) {
 	userID := ctx.MustGet(constants.UserID).(uint)
 
-	idStr := ctx.Param(constants.IDParam)
-	itemID, err := strconv.ParseUint(idStr, 10, 64)
+	itemID, err := GetIDParam(ctx)
 	if err != nil {
 		ResponseError(ctx, err)
 		return
