@@ -11,6 +11,7 @@ var (
 	ProductNotFound  = errors.New("product not found")
 	CartItemNotFound = errors.New("cart item not found")
 	OrderNotFound    = errors.New("order not found")
+	RatingNotFound   = errors.New("rating not found")
 
 	InvalidPassword    = errors.New("Invalid email or password")
 	InvalidOrderStatus = errors.New("invalid order status")
@@ -36,6 +37,7 @@ var (
 	CreateOrderFailed    = errors.New("failed to create order")
 	FetchOrdersFailed    = errors.New("failed to fetch order history")
 	UpdateOrderFailed    = errors.New("failed to update order status")
+	CreateRatingFailed   = errors.New("failed to submit rating")
 
 	InvalidToken       = errors.New("Invalid token")
 	MissingAuthHeader  = errors.New("Authorization header is required")
@@ -46,6 +48,7 @@ var (
 	AccessDenied = errors.New("Access denied. Admin role required.")
 
 	CategoryAlreadyExists = errors.New("category already exists")
+	RatingAlreadyExists   = errors.New("you have already rated this product")
 
 	CartIsEmpty = errors.New("cannot checkout because the cart is empty")
 )
@@ -57,8 +60,7 @@ var errorStatusMap = map[error]int{
 	CartItemNotFound: http.StatusNotFound,
 	OrderNotFound:    http.StatusNotFound,
 
-	InvalidPassword:    http.StatusUnauthorized,
-	InvalidOrderStatus: http.StatusBadRequest,
+	InvalidPassword: http.StatusUnauthorized,
 
 	EmailOrUserTaken: http.StatusUnprocessableEntity,
 	UsernameTaken:    http.StatusUnprocessableEntity,
@@ -81,6 +83,7 @@ var errorStatusMap = map[error]int{
 	CreateOrderFailed:    http.StatusInternalServerError,
 	FetchOrdersFailed:    http.StatusInternalServerError,
 	UpdateOrderFailed:    http.StatusInternalServerError,
+	CreateRatingFailed:   http.StatusInternalServerError,
 
 	InvalidToken:       http.StatusUnauthorized,
 	MissingAuthHeader:  http.StatusUnauthorized,
@@ -91,8 +94,10 @@ var errorStatusMap = map[error]int{
 	AccessDenied: http.StatusForbidden,
 
 	CategoryAlreadyExists: http.StatusConflict,
+	RatingAlreadyExists:   http.StatusConflict,
 
-	CartIsEmpty: http.StatusBadRequest,
+	CartIsEmpty:        http.StatusBadRequest,
+	InvalidOrderStatus: http.StatusBadRequest,
 }
 
 func GetStatusCodeAndMessage(err error) (int, string) {
