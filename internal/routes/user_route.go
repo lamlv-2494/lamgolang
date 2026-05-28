@@ -38,3 +38,12 @@ func RegisterOrderRoutes(api *gin.RouterGroup, orderHandler *handlers.OrderHandl
 		orderGroup.GET("", orderHandler.GetOrderHistory)
 	}
 }
+
+func RegisterRatingRoutes(api *gin.RouterGroup, ratingHandler *handlers.RatingHandler) {
+	ratingGroup := api.Group("/products", middlewares.AuthMiddleware())
+	{
+		ratingGroup.POST("/:id/rating", ratingHandler.CreateRating)
+		ratingGroup.GET("/:id/rating", ratingHandler.GetRatingsByID)
+		ratingGroup.GET("/ratings", ratingHandler.GetRatingsByUserID)
+	}
+}

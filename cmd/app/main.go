@@ -26,18 +26,21 @@ func main() {
 	productRepo := repositories.NewProductRepository(db)
 	cartRepo := repositories.NewCartRepository(db)
 	orderRepo := repositories.NewOrderRepository(db)
+	ratingRepo := repositories.NewRatingRepository(db)
 
 	userService := services.NewUserService(userRepo)
 	categoryService := services.NewCategoryService(categoryRepo)
 	productService := services.NewProductService(productRepo, categoryRepo)
 	cartService := services.NewCartService(cartRepo, productRepo)
 	orderService := services.NewOrderService(orderRepo, cartRepo)
+	ratingService := services.NewRatingService(ratingRepo, productRepo)
 
 	userHandlers := handlers.NewUserHandler(userService)
 	categoryHandler := handlers.NewCategoryHandler(categoryService)
 	productHandler := handlers.NewProductHandler(productService)
 	cartHandler := handlers.NewCartHandler(cartService)
 	orderHandler := handlers.NewOrderHandler(orderService)
+	ratingHandler := handlers.NewRatingHandler(ratingService)
 
 	adminHandlers := &routes.AdminHandlers{
 		OrderHandler:    orderHandler,
@@ -59,6 +62,7 @@ func main() {
 		routes.RegisterUserGroup(api, userHandlers)
 		routes.RegisterCartRoutes(api, cartHandler)
 		routes.RegisterOrderRoutes(api, orderHandler)
+		routes.RegisterRatingRoutes(api, ratingHandler)
 
 		// Admin
 		routes.RegisterAdminRoutes(api, adminHandlers)
