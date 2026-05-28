@@ -10,6 +10,7 @@ var (
 	CategoryNotFound = errors.New("category not found")
 	ProductNotFound  = errors.New("product not found")
 	CartItemNotFound = errors.New("cart item not found")
+	OrderNotFound    = errors.New("order not found")
 
 	InvalidPassword = errors.New("Invalid email or password")
 
@@ -31,6 +32,7 @@ var (
 	AddToCartFailed      = errors.New("failed to add item to cart")
 	UpdateCartItemFailed = errors.New("failed to update cart item")
 	RemoveFromCartFailed = errors.New("failed to remove item from cart")
+	CreateOrderFailed    = errors.New("failed to create order")
 
 	InvalidToken       = errors.New("Invalid token")
 	MissingAuthHeader  = errors.New("Authorization header is required")
@@ -41,6 +43,8 @@ var (
 	AccessDenied = errors.New("Access denied. Admin role required.")
 
 	CategoryAlreadyExists = errors.New("category already exists")
+
+	CartIsEmpty = errors.New("cannot checkout because the cart is empty")
 )
 
 var errorStatusMap = map[error]int{
@@ -48,6 +52,7 @@ var errorStatusMap = map[error]int{
 	CategoryNotFound: http.StatusNotFound,
 	ProductNotFound:  http.StatusNotFound,
 	CartItemNotFound: http.StatusNotFound,
+	OrderNotFound:    http.StatusNotFound,
 
 	InvalidPassword: http.StatusUnauthorized,
 
@@ -69,6 +74,7 @@ var errorStatusMap = map[error]int{
 	AddToCartFailed:      http.StatusInternalServerError,
 	UpdateCartItemFailed: http.StatusInternalServerError,
 	RemoveFromCartFailed: http.StatusInternalServerError,
+	CreateOrderFailed:    http.StatusInternalServerError,
 
 	InvalidToken:       http.StatusUnauthorized,
 	MissingAuthHeader:  http.StatusUnauthorized,
@@ -79,6 +85,8 @@ var errorStatusMap = map[error]int{
 	AccessDenied: http.StatusForbidden,
 
 	CategoryAlreadyExists: http.StatusConflict,
+
+	CartIsEmpty: http.StatusBadRequest,
 }
 
 func GetStatusCodeAndMessage(err error) (int, string) {

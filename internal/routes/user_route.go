@@ -31,3 +31,10 @@ func RegisterCartRoutes(api *gin.RouterGroup, cartHandler *handlers.CartHandler)
 		cartGroup.DELETE("/:id", cartHandler.RemoveFromCart) // Xoá món khỏi giỏ
 	}
 }
+
+func RegisterOrderRoutes(api *gin.RouterGroup, orderHandler *handlers.OrderHandler) {
+	orderGroup := api.Group("/orders", middlewares.AuthMiddleware())
+	{
+		orderGroup.POST("", orderHandler.Checkout) // API Đặt hàng (Checkout)
+	}
+}

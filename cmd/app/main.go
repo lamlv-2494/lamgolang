@@ -25,16 +25,19 @@ func main() {
 	categoryRepo := repositories.NewCategoryRepository(db)
 	productRepo := repositories.NewProductRepository(db)
 	cartRepo := repositories.NewCartRepository(db)
+	orderRepo := repositories.NewOrderRepository(db)
 
 	userService := services.NewUserService(userRepo)
 	categoryService := services.NewCategoryService(categoryRepo)
 	productService := services.NewProductService(productRepo, categoryRepo)
 	cartService := services.NewCartService(cartRepo, productRepo)
+	orderService := services.NewOrderService(orderRepo, cartRepo)
 
 	userHandlers := handlers.NewUserHandler(userService)
 	categoryHandler := handlers.NewCategoryHandler(categoryService)
 	productHandler := handlers.NewProductHandler(productService)
 	cartHandler := handlers.NewCartHandler(cartService)
+	orderHandler := handlers.NewOrderHandler(orderService)
 
 	adminHandlers := &routes.AdminHandlers{
 		CategoryHandler: categoryHandler,
@@ -53,6 +56,7 @@ func main() {
 		routes.RegisterUserGroup(api, userHandlers)
 		routes.RegisterAdminRoutes(api, adminHandlers)
 		routes.RegisterCartRoutes(api, cartHandler)
+		routes.RegisterOrderRoutes(api, orderHandler)
 	}
 
 	port := os.Getenv(constants.Port)
