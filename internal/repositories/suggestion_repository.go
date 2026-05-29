@@ -8,7 +8,7 @@ import (
 
 type SuggestionRepository interface {
 	Create(suggestion *entities.Suggestion) error
-	ListAll() ([]*entities.Suggestion, error)
+	ListAll(page, limit int) ([]*entities.Suggestion, int64, error)
 }
 
 type suggestionRepository struct {
@@ -23,15 +23,24 @@ func (r *suggestionRepository) Create(suggestion *entities.Suggestion) error {
 	return r.db.Create(suggestion).Error
 }
 
-func (r *suggestionRepository) ListAll() ([]*entities.Suggestion, error) {
+func (r *suggestionRepository) ListAll(page, limit int) ([]*entities.Suggestion, int64, error) {
 	var suggestions []*entities.Suggestion
-	err := r.db.
+	var totalCount int64
+
+	err := r.db.Model(&entities.Suggestion{}).Count(&totalCount).Error
+	if err != nil {
+		return nil, 0, err
+	}
+
+	err = r.db.
 		Preload("User").
 		Order("created_at desc").
+		Offset((page - 1) * limit).
+		Limit(limit).
 		Find(&suggestions).
 		Error
 	if err != nil {
-		return nil, err
+		return nil, totalCount, err
 	}
-	return suggestions, nil
+	return suggestions, totalCount, nil
 }

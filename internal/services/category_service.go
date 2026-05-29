@@ -3,6 +3,7 @@ package services
 import (
 	"food_delivery/internal/configs"
 	"food_delivery/internal/models/dto/requests"
+	"food_delivery/internal/models/dto/responses"
 	"food_delivery/internal/models/entities"
 	"food_delivery/internal/repositories"
 )
@@ -11,7 +12,7 @@ type CategoryService interface {
 	CreateCategory(req requests.CreateCategoryRequest) (*entities.Category, error)
 	UpdateCategory(id uint, req requests.UpdateCategoryRequest) (*entities.Category, error)
 	DeleteCategory(id uint) error
-	GetCategories() ([]*entities.Category, error)
+	GetCategories(page, limit int) (responses.AnyListResponse, error)
 }
 
 type categoryService struct {
@@ -68,6 +69,14 @@ func (s *categoryService) DeleteCategory(id uint) error {
 	return s.repo.Delete(category)
 }
 
-func (s *categoryService) GetCategories() ([]*entities.Category, error) {
-	return s.repo.List()
+func (s *categoryService) GetCategories(page, limit int) (responses.AnyListResponse, error) {
+	categories, totalCount, err := s.repo.List(page, limit)
+	if err != nil {
+		return responses.AnyListResponse{}, err
+	}
+
+	return responses.AnyListResponse{
+		Data:       categories,
+		TotalCount: totalCount,
+	}, nil
 }

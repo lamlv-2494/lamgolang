@@ -156,7 +156,9 @@ func (h *ProductHandler) GetProducts(ctx *gin.Context) {
 		}
 	}
 
-	products, err := h.service.GetProducts(classify, categoryID, minPrice, maxPrice, minRating, sort)
+	page, limit := GetPaginationParams(ctx)
+
+	products, err := h.service.GetProducts(classify, categoryID, minPrice, maxPrice, minRating, sort, page, limit)
 	if err != nil {
 		ResponseError(ctx, err)
 		return

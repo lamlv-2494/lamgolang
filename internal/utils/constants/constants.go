@@ -19,4 +19,7 @@ const (
 	MaxPriceParam   = "max_price"
 	RatingParam     = "rating"
 	SortParam       = "sort"
+
+	PageParam  = "page"
+	LimitParam = "limit"
 )

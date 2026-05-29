@@ -12,7 +12,7 @@ type ProductService interface {
 	CreateProduct(req requests.CreateProductRequest) (*responses.ProductData, error)
 	UpdateProduct(id uint, req requests.UpdateProductRequest) (*responses.ProductData, error)
 	DeleteProduct(id uint) error
-	GetProducts(classify string, categoryID uint, minPrice, maxPrice float64, minRating float64, sort string) ([]*responses.ProductData, error)
+	GetProducts(classify string, categoryID uint, minPrice, maxPrice float64, minRating float64, sort string, page, limit int) (*responses.AnyListResponse, error)
 
 	GetProductByID(id uint) (*responses.ProductData, error)
 }
@@ -131,14 +131,17 @@ func (s *productService) DeleteProduct(id uint) error {
 	return nil
 }
 
-func (s *productService) GetProducts(classify string, categoryID uint, minPrice, maxPrice float64, minRating float64, sort string) ([]*responses.ProductData, error) {
-	products, err := s.productRepo.List(classify, categoryID, minPrice, maxPrice, minRating, sort)
+func (s *productService) GetProducts(classify string, categoryID uint, minPrice, maxPrice float64, minRating float64, sort string, page, limit int) (*responses.AnyListResponse, error) {
+	products, totalCount, err := s.productRepo.List(classify, categoryID, minPrice, maxPrice, minRating, sort, page, limit)
 	if err != nil {
 		return nil, configs.ProductNotFound
 	}
 
 	if len(products) == 0 {
-		return []*responses.ProductData{}, nil
+		return &responses.AnyListResponse{
+			Data:       []*responses.ProductData{},
+			TotalCount: totalCount,
+		}, nil
 	}
 
 	var productResponses []*responses.ProductData
@@ -167,7 +170,10 @@ func (s *productService) GetProducts(classify string, categoryID uint, minPrice,
 		})
 	}
 
-	return productResponses, nil
+	return &responses.AnyListResponse{
+		Data:       productResponses,
+		TotalCount: totalCount,
+	}, nil
 }
 
 func (s *productService) GetProductByID(id uint) (*responses.ProductData, error) {

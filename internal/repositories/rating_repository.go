@@ -10,7 +10,7 @@ type RatingRepository interface {
 	Create(rating *entities.Rating) error
 	FindByUserAndProduct(userID, productID uint) (*entities.Rating, error)
 
-	GetRatingsByUserID(userID uint) ([]*entities.Rating, error)
+	GetRatingsByUserID(userID uint, page, limit int) ([]*entities.Rating, int64, error)
 }
 
 type ratingRepository struct {
@@ -40,14 +40,21 @@ func (r *ratingRepository) FindByUserAndProduct(userID, productID uint) (*entiti
 	return &rating, nil
 }
 
-func (r *ratingRepository) GetRatingsByUserID(userID uint) ([]*entities.Rating, error) {
+func (r *ratingRepository) GetRatingsByUserID(userID uint, page, limit int) ([]*entities.Rating, int64, error) {
 	var ratings []*entities.Rating
-	err := r.db.Where("user_id = ?", userID).Find(&ratings).Error
+	var totalCount int64
+
+	err := r.db.Model(&entities.Rating{}).Where("user_id = ?", userID).Count(&totalCount).Error
+	if err != nil {
+		return nil, 0, err
+	}
+
+	err = r.db.Where("user_id = ?", userID).Offset((page - 1) * limit).Limit(limit).Find(&ratings).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
-			return nil, nil
+			return nil, totalCount, nil
 		}
-		return nil, err
+		return nil, totalCount, err
 	}
-	return ratings, nil
+	return ratings, totalCount, nil
 }

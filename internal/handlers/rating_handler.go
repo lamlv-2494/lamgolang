@@ -41,7 +41,7 @@ func (h *RatingHandler) CreateRating(ctx *gin.Context) {
 
 }
 
-func (h *RatingHandler) GetRatingsByID(ctx *gin.Context) {
+func (h *RatingHandler) GetRatingByID(ctx *gin.Context) {
 	userID := ctx.MustGet(constants.UserID).(uint)
 	productID, err := GetIDParam(ctx)
 	if err != nil {
@@ -49,7 +49,7 @@ func (h *RatingHandler) GetRatingsByID(ctx *gin.Context) {
 		return
 	}
 
-	rating, err := h.service.GetRatingsByID(userID, productID)
+	rating, err := h.service.GetRatingByID(userID, productID)
 	if err != nil {
 		ResponseError(ctx, err)
 		return
@@ -61,7 +61,9 @@ func (h *RatingHandler) GetRatingsByID(ctx *gin.Context) {
 func (h *RatingHandler) GetRatingsByUserID(ctx *gin.Context) {
 	userID := ctx.MustGet(constants.UserID).(uint)
 
-	ratings, err := h.service.GetRatingsByUserID(userID)
+	page, limit := GetPaginationParams(ctx)
+
+	ratings, err := h.service.GetRatingsByUserID(userID, page, limit)
 	if err != nil {
 		ResponseError(ctx, err)
 		return

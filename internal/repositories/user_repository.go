@@ -12,7 +12,7 @@ type UserRepository interface {
 	FindByID(id uint) (*entities.User, error)
 	FindByUsername(username string) (*entities.User, error)
 	UpdateUser(user *entities.User) error
-	FindAllUsers() ([]*entities.User, error)
+	FindAllUsers(page, limit int) ([]*entities.User, int64, error)
 	DeleteUser(user *entities.User) error
 }
 
@@ -54,12 +54,25 @@ func (u *userRepository) UpdateUser(user *entities.User) error {
 	return u.db.Save(user).Error
 }
 
-func (u *userRepository) FindAllUsers() ([]*entities.User, error) {
+func (u *userRepository) FindAllUsers(page, limit int) ([]*entities.User, int64, error) {
 	var users []*entities.User
-	if err := u.db.Order("id DESC").Find(&users).Error; err != nil {
-		return nil, err
+	var totalCount int64
+
+	err := u.db.Model(&entities.User{}).Count(&totalCount).Error
+	if err != nil {
+		return nil, 0, err
 	}
-	return users, nil
+
+	err = u.db.
+		Order("id DESC").
+		Offset((page - 1) * limit).
+		Limit(limit).
+		Find(&users).
+		Error
+	if err != nil {
+		return nil, totalCount, err
+	}
+	return users, totalCount, nil
 }
 
 func (u *userRepository) DeleteUser(user *entities.User) error {
