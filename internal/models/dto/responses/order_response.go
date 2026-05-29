@@ -18,3 +18,11 @@ type OrderResponse struct {
 	CreatedAt  time.Time       `json:"created_at"`
 	Items      []OrderItemData `json:"items"`
 }
+
+type OrderListResponse struct {
+	Items           []*OrderResponse `json:"items"`
+	TotalCount      int64            `json:"totalCount"`
+	TotalPrice      float64          `json:"totalPrice,omitempty"`
+	CompletedCount  int64            `json:"completedCount,omitempty"`
+	ProcessingCount int64            `json:"processingCount,omitempty"`
+}

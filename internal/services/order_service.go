@@ -11,7 +11,7 @@ import (
 type OrderService interface {
 	Checkout(userID uint) (*responses.OrderResponse, error)
 
-	GetOrderHistory(userID uint, page, limit int) (*responses.ListResponse[*responses.OrderResponse], error)
+	GetOrderHistory(userID uint, page, limit int) (*responses.OrderListResponse, error)
 
 	AdminGetAllOrders(page, limit int) (*responses.ListResponse[*responses.OrderResponse], error)
 	AdminUpdateOrderStatus(orderID uint, req requests.UpdateOrderStatusRequest) (*responses.OrderResponse, error)
@@ -82,15 +82,20 @@ func (s *orderService) Checkout(userID uint) (*responses.OrderResponse, error) {
 	}, nil
 }
 
-func (s *orderService) GetOrderHistory(userID uint, page, limit int) (*responses.ListResponse[*responses.OrderResponse], error) {
-	orders, totalCount, err := s.orderRepo.ListByUserID(userID, page, limit)
+func (s *orderService) GetOrderHistory(userID uint, page, limit int) (*responses.OrderListResponse, error) {
+	orders, totalCount, totalAmount, statusCounts, err := s.orderRepo.ListByUserID(userID, page, limit)
 	if err != nil {
 		return nil, configs.FetchOrdersFailed
 	}
 
-	response := &responses.ListResponse[*responses.OrderResponse]{
-		Items:      s.mapOrdersToResponse(orders),
-		TotalCount: totalCount,
+	processingCount := statusCounts["pending"] + statusCounts["processing"] + statusCounts["delivering"]
+
+	response := &responses.OrderListResponse{
+		Items:           s.mapOrdersToResponse(orders),
+		TotalCount:      totalCount,
+		TotalPrice:      totalAmount,
+		CompletedCount:  statusCounts["completed"],
+		ProcessingCount: processingCount,
 	}
 
 	return response, nil

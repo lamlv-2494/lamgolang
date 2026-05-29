@@ -507,7 +507,7 @@
     // --- Categories ---
     async function loadCategories() {
         try {
-            const res = await fetchAPI('/categories?page=1&limit=50');
+            const res = await fetchAPI('/categories?page=1&limit=10');
             const list = document.getElementById('categoryList');
             list.innerHTML = '';
             // Add default "All" category

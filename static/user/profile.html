@@ -432,7 +432,7 @@
         const list = document.getElementById('ratingsList');
         list.innerHTML = `<div class="text-center py-4 text-muted"><span class="spinner-border spinner-border-sm me-2"></span>Loading...</div>`;
         try {
-            const res = await fetchAPI('/products/ratings');
+            const res = await fetchAPI('/products/ratings?page=1&limit=10');
             const ratings = res.items || [];
             const total = res.totalCount || (ratings && ratings.length) || 0;
             if (!ratings.length) {

@@ -8,7 +8,7 @@ import (
 
 type OrderRepository interface {
 	CreateOrderWithTransaction(order *entities.Order) error
-	ListByUserID(userID uint, page, limit int) ([]*entities.Order, int64, error)
+	ListByUserID(userID uint, page, limit int) ([]*entities.Order, int64, float64, map[string]int64, error)
 
 	// Admin only
 	FindByOrderID(id uint) (*entities.Order, error)
@@ -38,11 +38,33 @@ func (r *orderRepository) CreateOrderWithTransaction(order *entities.Order) erro
 	})
 }
 
-func (r *orderRepository) ListByUserID(userID uint, page, limit int) ([]*entities.Order, int64, error) {
+func (r *orderRepository) ListByUserID(userID uint, page, limit int) ([]*entities.Order, int64, float64, map[string]int64, error) {
 	var orders []*entities.Order
 	var totalCount int64
+	var totalAmount float64
+
 	if err := r.db.Model(&entities.Order{}).Where("user_id = ?", userID).Count(&totalCount).Error; err != nil {
-		return nil, 0, err
+		return nil, 0, 0, nil, err
+	}
+
+	if err := r.db.Model(&entities.Order{}).Where("user_id = ?", userID).Select("SUM(total_price)").Scan(&totalAmount).Error; err != nil {
+		return nil, 0, 0, nil, err
+	}
+
+	var statusRows []struct {
+		Status string `gorm:"column:status"`
+		Count  int64  `gorm:"column:count"`
+	}
+	if err := r.db.Model(&entities.Order{}).
+		Where("user_id = ?", userID).
+		Select("status, COUNT(*) as count").
+		Group("status").
+		Scan(&statusRows).Error; err != nil {
+		return nil, 0, 0, nil, err
+	}
+	statusCounts := make(map[string]int64)
+	for _, row := range statusRows {
+		statusCounts[row.Status] = row.Count
 	}
 
 	if err := r.db.
@@ -54,10 +76,10 @@ func (r *orderRepository) ListByUserID(userID uint, page, limit int) ([]*entitie
 		Offset((page - 1) * limit).
 		Find(&orders).
 		Error; err != nil {
-		return nil, 0, err
+		return nil, 0, 0, nil, err
 	}
 
-	return orders, totalCount, nil
+	return orders, totalCount, totalAmount, statusCounts, nil
 }
 
 func (r *orderRepository) FindByOrderID(id uint) (*entities.Order, error) {
