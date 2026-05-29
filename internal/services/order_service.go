@@ -11,9 +11,9 @@ import (
 type OrderService interface {
 	Checkout(userID uint) (*responses.OrderResponse, error)
 
-	GetOrderHistory(userID uint, page, limit int) (*responses.AnyListResponse, error)
+	GetOrderHistory(userID uint, page, limit int) (*responses.ListResponse[*responses.OrderResponse], error)
 
-	AdminGetAllOrders(page, limit int) (*responses.AnyListResponse, error)
+	AdminGetAllOrders(page, limit int) (*responses.ListResponse[*responses.OrderResponse], error)
 	AdminUpdateOrderStatus(orderID uint, req requests.UpdateOrderStatusRequest) (*responses.OrderResponse, error)
 }
 
@@ -82,28 +82,28 @@ func (s *orderService) Checkout(userID uint) (*responses.OrderResponse, error) {
 	}, nil
 }
 
-func (s *orderService) GetOrderHistory(userID uint, page, limit int) (*responses.AnyListResponse, error) {
+func (s *orderService) GetOrderHistory(userID uint, page, limit int) (*responses.ListResponse[*responses.OrderResponse], error) {
 	orders, totalCount, err := s.orderRepo.ListByUserID(userID, page, limit)
 	if err != nil {
 		return nil, configs.FetchOrdersFailed
 	}
 
-	response := &responses.AnyListResponse{
-		Data:       s.mapOrdersToResponse(orders),
+	response := &responses.ListResponse[*responses.OrderResponse]{
+		Items:      s.mapOrdersToResponse(orders),
 		TotalCount: totalCount,
 	}
 
 	return response, nil
 }
 
-func (s *orderService) AdminGetAllOrders(page, limit int) (*responses.AnyListResponse, error) {
+func (s *orderService) AdminGetAllOrders(page, limit int) (*responses.ListResponse[*responses.OrderResponse], error) {
 	orders, totalCount, err := s.orderRepo.ListAll(page, limit)
 	if err != nil {
 		return nil, configs.FetchOrdersFailed
 	}
 
-	response := &responses.AnyListResponse{
-		Data:       s.mapOrdersToResponse(orders),
+	response := &responses.ListResponse[*responses.OrderResponse]{
+		Items:      s.mapOrdersToResponse(orders),
 		TotalCount: totalCount,
 	}
 

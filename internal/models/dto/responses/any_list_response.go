@@ -1,6 +1,6 @@
 package responses
 
-type AnyListResponse struct {
-	Data       any   `json:"data"`
+type ListResponse[T any] struct {
+	Items      []T   `json:"items"`
 	TotalCount int64 `json:"totalCount"`
 }

@@ -12,7 +12,7 @@ type ProductService interface {
 	CreateProduct(req requests.CreateProductRequest) (*responses.ProductData, error)
 	UpdateProduct(id uint, req requests.UpdateProductRequest) (*responses.ProductData, error)
 	DeleteProduct(id uint) error
-	GetProducts(search, classify string, categoryID uint, minPrice, maxPrice float64, minRating float64, sort string, page, limit int) (*responses.AnyListResponse, error)
+	GetProducts(search, classify string, categoryID uint, minPrice, maxPrice float64, minRating float64, sort string, page, limit int) (*responses.ListResponse[*responses.ProductData], error)
 
 	GetProductByID(id uint) (*responses.ProductData, error)
 }
@@ -131,15 +131,15 @@ func (s *productService) DeleteProduct(id uint) error {
 	return nil
 }
 
-func (s *productService) GetProducts(search, classify string, categoryID uint, minPrice, maxPrice float64, minRating float64, sort string, page, limit int) (*responses.AnyListResponse, error) {
+func (s *productService) GetProducts(search, classify string, categoryID uint, minPrice, maxPrice float64, minRating float64, sort string, page, limit int) (*responses.ListResponse[*responses.ProductData], error) {
 	products, totalCount, err := s.productRepo.List(search, classify, categoryID, minPrice, maxPrice, minRating, sort, page, limit)
 	if err != nil {
 		return nil, configs.ProductNotFound
 	}
 
 	if len(products) == 0 {
-		return &responses.AnyListResponse{
-			Data:       []*responses.ProductData{},
+		return &responses.ListResponse[*responses.ProductData]{
+			Items:      []*responses.ProductData{},
 			TotalCount: totalCount,
 		}, nil
 	}
@@ -170,8 +170,8 @@ func (s *productService) GetProducts(search, classify string, categoryID uint, m
 		})
 	}
 
-	return &responses.AnyListResponse{
-		Data:       productResponses,
+	return &responses.ListResponse[*responses.ProductData]{
+		Items:      productResponses,
 		TotalCount: totalCount,
 	}, nil
 }
