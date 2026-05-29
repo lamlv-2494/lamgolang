@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Manage Users</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { font-family: 'Poppins', sans-serif; }
+        body { background: #fafafa; min-height: 100vh; }
+        .navbar { background: linear-gradient(135deg, #c0392b, #e74c3c) !important; box-shadow: 0 2px 20px rgba(0,0,0,.2); }
+        .navbar-brand { font-weight: 800; color: #fff !important; font-size: 1.2rem; }
+        .navbar-brand i { color: #ffd166; }
+        .btn-logout { background: rgba(255,255,255,.2); border: 1px solid rgba(255,255,255,.4); color: #fff; font-weight: 600; transition: all .3s; }
+        .btn-logout:hover { background: rgba(255,255,255,.3); color: #ffd166; }
+        .admin-container { margin-top: 20px; margin-bottom: 40px; }
+        .admin-sidebar { margin-bottom: 24px; }
+        .admin-nav { background: #fff; border-radius: 16px; box-shadow: 0 4px 16px rgba(0,0,0,.06); overflow: hidden; }
+        .admin-nav a { display: flex; align-items: center; gap: 12px; padding: 14px 18px; border: none; color: #636e72; font-weight: 500; border-left: 4px solid transparent; transition: all .25s; font-size: .95rem; }
+        .admin-nav a:hover { background: #f9f9f9; color: #e74c3c; border-left-color: #e74c3c; }
+        .admin-nav a.active { background: linear-gradient(135deg, #fff8f5, #fff3ef); color: #e74c3c; border-left-color: #e74c3c; font-weight: 700; }
+        .admin-nav a i { width: 20px; text-align: center; }
+        .admin-card { background: #fff; border-radius: 20px; box-shadow: 0 4px 20px rgba(0,0,0,.08); overflow: hidden; }
+        .admin-card-header { background: linear-gradient(135deg, #fff8f5, #fff3ef); padding: 24px; border-bottom: 2px solid #f0f0f0; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+        .admin-card-header h5 { font-weight: 700; color: #2d3436; margin: 0; font-size: 1.1rem; }
+        .btn-add { background: linear-gradient(135deg, #e74c3c, #c0392b); border: none; border-radius: 10px; color: #fff; font-weight: 600; padding: 10px 20px; transition: all .3s; font-size: .9rem; }
+        .btn-add:hover { transform: translateY(-2px); box-shadow: 0 8px 16px rgba(231,76,60,.3); color: #fff; }
+        .btn-add i { margin-right: 6px; }
+        .admin-card-body { padding: 0; }
+        .table-wrapper { overflow-x: auto; }
+        .admin-table { margin: 0; }
+        .admin-table thead th { background: #f9f9f9; font-weight: 700; color: #636e72; border-bottom: 2px solid #f0f0f0; padding: 16px; font-size: .9rem; }
+        .admin-table tbody td { padding: 14px 16px; border-bottom: 1px solid #f0f0f0; color: #636e72; }
+        .admin-table tbody tr:hover { background: #f9f9f9; }
+        .badge-role { background: #fff3f0; color: #e74c3c; border: 1px solid #ffd4d0; border-radius: 8px; padding: 4px 10px; font-size: .8rem; font-weight: 600; }
+        .btn-delete { background: none; border: 1px solid #e74c3c; color: #e74c3c; border-radius: 8px; padding: 6px 14px; font-size: .85rem; font-weight: 600; transition: all .2s; }
+        .btn-delete:hover { background: #e74c3c; color: #fff; }
+        .pagination-wrapper { padding: 20px 24px; background: #f9f9f9; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+        .pagination-info { color: #636e72; font-size: .9rem; }
+        @media (max-width: 768px) {
+            .navbar { padding: 12px 0; }
+            .navbar-brand { font-size: 1rem; }
+            .admin-container { margin-top: 12px; }
+            .admin-nav a { padding: 12px 14px; font-size: .9rem; }
+            .admin-card-header { padding: 16px; gap: 8px; }
+            .admin-card-header h5 { font-size: 1rem; }
+            .btn-add { font-size: .85rem; padding: 8px 16px; }
+            .admin-table thead th, .admin-table tbody td { padding: 12px; font-size: .85rem; }
+            .pagination-wrapper { padding: 16px; flex-direction: column; }
+            .pagination-info { font-size: .8rem; }
+        }
+        @media (max-width: 576px) {
+            .navbar-brand { font-size: .9rem; }
+            .admin-card-header { padding: 12px; }
+            .admin-card-header h5 { font-size: .9rem; }
+            .btn-add { font-size: .8rem; padding: 6px 12px; }
+            .admin-table thead { display: none; }
+            .admin-table tbody, .admin-table tr, .admin-table td { display: block; width: 100%; }
+            .admin-table tr { margin-bottom: 16px; border: 1px solid #f0f0f0; border-radius: 10px; overflow: hidden; }
+            .admin-table td { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; border-bottom: 1px solid #f0f0f0; }
+            .admin-table td:first-child { font-weight: 700; color: #2d3436; }
+            .pagination-wrapper { padding: 12px; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid">
+            <span class="navbar-brand"><i class="fas fa-utensils me-2"></i>Admin Panel</span>
+            <button class="btn btn-logout btn-sm ms-auto" onclick="adminLogout()"><i class="fas fa-sign-out-alt me-1"></i>Logout</button>
+        </div>
+    </nav>
+
+    <div class="container admin-container">
+        <div class="row">
+            <div class="col-md-3 admin-sidebar">
+                <div class="admin-nav">
+                    <a href="categories.html"><i class="fas fa-list"></i>Manage Categories</a>
+                    <a href="products.html"><i class="fas fa-box"></i>Manage Products</a>
+                    <a href="orders.html"><i class="fas fa-receipt"></i>Manage Orders</a>
+                    <a href="users.html" class="active"><i class="fas fa-users"></i>Manage Users</a>
+                    <a href="suggestions.html"><i class="fas fa-lightbulb"></i>Suggestions</a>
+                </div>
+            </div>
+
+            <div class="col-md-9">
+                <div class="admin-card">
+                    <div class="admin-card-header">
+                        <h5>Registered Users Accounts</h5>
+                    </div>
+                    <div class="admin-card-body">
+                        <div class="table-wrapper">
+                            <table class="table admin-table table-hover align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>User ID</th>
+                                        <th>Username</th>
+                                        <th>Email Address</th>
+                                        <th>System Role</th>
+                                        <th class="text-end">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="userTableBody">
+                                    </tbody>
+                            </table>
+                        </div>
+
+                        <div class="pagination-wrapper">
+                            <span class="pagination-info" id="paginationInfo">Showing 0 of 0 items</span>
+                            <ul class="pagination pagination-sm mb-0" id="paginationControls">
+                                </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/api.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Enforce strict token scope role check before loading view context
+        requireAdmin();
+
+        let currentPage = 1;
+        const pageLimit = 5;
+
+        // Initialize lists on page readiness state
+        window.addEventListener('DOMContentLoaded', () => loadUsers(currentPage));
+
+        // Pull paginated user account collections from Backend server
+        async function loadUsers(page) {
+            currentPage = page;
+            try {
+                // Execute administrative protected endpoint passing pagination query params
+                const response = await fetchAPI(`/admin/users?page=${page}&limit=${pageLimit}`, 'GET');
+                
+                // Read exact properties matching your unified Go Generic ListResponse structure
+                const users = response.items || [];
+                const totalCount = response.totalCount || 0;
+
+                renderTable(users);
+                renderPagination(totalCount);
+            } catch (error) {
+                alert('Failed to load user accounts list: ' + error.message);
+            }
+        }
+
+        // Render user records dataset directly onto DOM element row cells
+        function renderTable(users) {
+            const tbody = document.getElementById('userTableBody');
+            tbody.innerHTML = '';
+
+            if (users.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center text-muted py-4"><i class="fas fa-inbox me-2"></i>No system users found.</td></tr>`;
+                return;
+            }
+
+            users.forEach(user => {
+                const row = `
+                    <tr>
+                        <td><strong>#USER-${user.id}</strong></td>
+                        <td><span class="fw-semibold">${user.username}</span></td>
+                        <td>${user.email}</td>
+                        <td><span class="badge-role">${user.role.toUpperCase()}</span></td>
+                        <td class="text-end">
+                            <button class="btn btn-delete" 
+                                    ${user.role === 'admin' ? 'disabled' : ''} 
+                                    onclick="deleteUser(${user.id})">
+                                <i class="fas fa-trash me-1"></i>Delete
+                            </button>
+                        </td>
+                    </tr>
+                `;
+                tbody.insertAdjacentHTML('beforeend', row);
+            });
+        }
+
+        // Generate reactive pagination controls button mapping total records
+        function renderPagination(totalCount) {
+            const info = document.getElementById('paginationInfo');
+            const controls = document.getElementById('paginationControls');
+            controls.innerHTML = '';
+
+            const totalPages = Math.ceil(totalCount / pageLimit);
+            info.textContent = `Showing page ${currentPage} of ${totalPages || 1} (Total: ${totalCount} users)`;
+
+            if (totalPages <= 1) return;
+
+            for (let i = 1; i <= totalPages; i++) {
+                const activeClass = i === currentPage ? 'active' : '';
+                const li = `
+                    <li class="page-item ${activeClass}">
+                        <button class="page-link" onclick="loadUsers(${i})">${i}</button>
+                    </li>
+                `;
+                controls.insertAdjacentHTML('beforeend', li);
+            }
+        }
+
+        // Handle defensive delete trigger actions for consumer accounts
+        async function deleteUser(id) {
+            if (!confirm('Are you absolutely sure you want to permanently delete this user account?')) return;
+            try {
+                // Send delete request context targeting specific id token param
+                await fetchAPI(`/admin/users/${id}`, 'DELETE');
+                loadUsers(currentPage);
+            } catch (error) {
+                alert('Operation failed: ' + error.message);
+            }
+        }
+    </script>
+</body>
+</html>

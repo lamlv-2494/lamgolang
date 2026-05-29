@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile - FoodDelivery</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { font-family: 'Poppins', sans-serif; }
+        body { background: #fafafa; }
+
+        .navbar { background: linear-gradient(135deg, #c0392b, #e74c3c) !important; box-shadow: 0 2px 20px rgba(0,0,0,.2); }
+        .navbar-brand { font-weight: 800; color: #fff !important; font-size: 1.3rem; }
+        .navbar-brand span { color: #ffd166; }
+        .nav-link { color: rgba(255,255,255,.85) !important; font-weight: 500; }
+        .nav-link:hover { color: #ffd166 !important; }
+
+        /* Hero banner */
+        .profile-hero {
+            background: linear-gradient(135deg, #c0392b, #e74c3c, #e67e22);
+            padding: 48px 0 80px; color: #fff; position: relative; overflow: hidden;
+        }
+        .profile-hero::before {
+            content: ''; position: absolute; top: -80px; right: -80px;
+            width: 300px; height: 300px; border-radius: 50%; background: rgba(255,255,255,.07);
+        }
+
+        .avatar-wrapper { position: relative; display: inline-block; }
+        .avatar-circle {
+            width: 96px; height: 96px; border-radius: 50%;
+            background: linear-gradient(135deg, #ffd166, #e67e22);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 2.4rem; font-weight: 800; color: #fff;
+            border: 4px solid rgba(255,255,255,.4);
+            box-shadow: 0 8px 24px rgba(0,0,0,.2);
+        }
+        .user-name-hero { font-size: 1.6rem; font-weight: 800; }
+        .user-email-hero { color: rgba(255,255,255,.8); font-size: .95rem; }
+        .role-badge {
+            display: inline-block; background: rgba(255,255,255,.2); border: 1px solid rgba(255,255,255,.4);
+            color: #ffd166; font-size: .8rem; font-weight: 700; border-radius: 20px; padding: 3px 14px; margin-top: 6px;
+        }
+
+        /* Content section */
+        .profile-section { margin-top: -44px; position: relative; z-index: 1; }
+
+        /* Tabs */
+        .nav-tabs-custom { border: none; gap: 8px; }
+        .nav-tabs-custom .nav-link {
+            border: 2px solid #ddd; border-radius: 12px; font-weight: 700;
+            padding: 12px 24px; transition: all .25s; background: #f8f8f8; font-size: .95rem;
+        }
+        /* Unselected tabs: gray text */
+        .nav-tabs-custom .nav-link:not(.active) { color: #636e72 !important; }
+        /* Hover and active keep original colors */
+        .nav-tabs-custom .nav-link:hover { border-color: #e74c3c; color: #e74c3c !important; background: #fff8f5; }
+        .nav-tabs-custom .nav-link.active { background: linear-gradient(135deg, #e74c3c, #c0392b); color: #fff !important; border-color: transparent; box-shadow: 0 4px 12px rgba(231,76,60,.35); }
+
+        /* Cards */
+        .info-card { background: #fff; border-radius: 20px; padding: 28px; box-shadow: 0 4px 16px rgba(0,0,0,.06); }
+        .info-card .card-section-title { font-weight: 700; color: #2d3436; font-size: 1rem; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #f9f9f9; display: flex; align-items: center; gap: 8px; }
+        .info-card .card-section-title i { color: #e74c3c; }
+
+        .form-label { font-weight: 600; font-size: .85rem; color: #636e72; margin-bottom: 6px; }
+        .input-group-text { background: #fff3f0; border: 2px solid #f0f0f0; border-right: none; border-radius: 12px 0 0 12px !important; color: #e74c3c; }
+        .form-control {
+            border: 2px solid #f0f0f0; border-radius: 0 12px 12px 0 !important;
+            padding: 11px 14px; transition: all .3s; font-size: .95rem;
+        }
+        .form-control:focus { border-color: #e74c3c; box-shadow: 0 0 0 3px rgba(231,76,60,.12); outline: none; }
+        .form-control:read-only { background: #fafafa; color: #636e72; }
+
+        .btn-save {
+            background: linear-gradient(135deg, #e74c3c, #c0392b); border: none;
+            border-radius: 12px; padding: 12px 32px; font-weight: 700; color: #fff; transition: all .3s;
+        }
+        .btn-save:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(231,76,60,.35); color: #fff; }
+        .btn-save:disabled { opacity: .7; transform: none; }
+        .btn-cancel { border: 2px solid #f0f0f0; border-radius: 12px; padding: 12px 28px; color: #636e72; background: #fff; font-weight: 600; transition: all .2s; }
+        .btn-cancel:hover { border-color: #e74c3c; color: #e74c3c; }
+
+        /* Ratings tab */
+        .rating-item { background: #fff8f5; border: 1px solid #ffd4d0; border-radius: 14px; padding: 16px 20px; margin-bottom: 12px; }
+        .rating-stars { color: #ffc107; font-size: 1rem; }
+        .rating-comment { color: #636e72; font-size: .9rem; margin-top: 4px; }
+        .rating-product-id { font-size: .8rem; color: #b2bec3; }
+
+        /* Quick links */
+        .quick-link-card { background: #fff; border-radius: 16px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,.06); text-align: center; cursor: pointer; transition: all .3s; text-decoration: none; display: block; }
+        .quick-link-card:hover { transform: translateY(-4px); box-shadow: 0 12px 28px rgba(0,0,0,.12); }
+        .quick-link-icon { width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; margin: 0 auto 10px; }
+        .quick-link-label { font-weight: 600; color: #2d3436; font-size: .9rem; }
+
+        /* Alert */
+        .alert-success-custom { background: #f0fff4; border: 1px solid #c3e6cb; color: #155724; border-radius: 12px; font-size: .9rem; }
+        .alert-error-custom   { background: #fff3f0; border: 1px solid #ffd4d0; color: #c0392b; border-radius: 12px; font-size: .9rem; }
+
+        /* Toast */
+        .toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 9999; }
+        .toast-success { background: linear-gradient(135deg, #00b894, #00cec9); color: #fff; border: none; border-radius: 12px; }
+        .toast-error   { background: linear-gradient(135deg, #e74c3c, #c0392b); color: #fff; border: none; border-radius: 12px; }
+
+        /* Danger zone */
+        .danger-zone { border: 2px solid #ffd4d0; border-radius: 14px; padding: 20px; background: #fff8f5; }
+        .danger-zone h6 { color: #c0392b; font-weight: 700; }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .navbar { padding: 12px 0; }
+            .navbar-brand { font-size: 1.1rem; }
+            .page-header { padding: 30px 0 40px; }
+            .page-header h1 { font-size: 1.5rem; }
+            .page-header p { font-size: 0.9rem; }
+            .profile-card { border-radius: 16px; padding: 20px; }
+            .form-group { margin-bottom: 16px; }
+            .form-label { font-size: 0.95rem; }
+            .form-control { font-size: 0.95rem; padding: 10px 16px; }
+            .btn-save { padding: 10px 24px; font-size: 0.95rem; }
+            .btn-cancel { padding: 10px 20px; font-size: 0.95rem; }
+            .quick-link-card { padding: 16px; }
+            .quick-link-icon { width: 48px; height: 48px; font-size: 1.2rem; }
+            .quick-link-label { font-size: 0.85rem; }
+            .rating-item { padding: 12px 16px; margin-bottom: 10px; }
+            .alert-success-custom, .alert-error-custom { font-size: 0.85rem; }
+        }
+
+        @media (max-width: 576px) {
+            .navbar-brand { font-size: 1rem; }
+            .nav-link { font-size: 0.85rem; }
+            .page-header { padding: 20px 0 30px; }
+            .page-header h1 { font-size: 1.2rem; }
+            .page-header p { font-size: 0.8rem; }
+            .profile-card { border-radius: 12px; padding: 16px; margin-bottom: 12px; }
+            .profile-tabs { flex-wrap: wrap; gap: 8px; }
+            .nav-link { padding: 10px 12px !important; font-size: 0.8rem; }
+            .nav-link.active { border-bottom: 3px solid #e74c3c; }
+            .form-group { margin-bottom: 12px; }
+            .form-label { font-size: 0.9rem; margin-bottom: 6px; }
+            .form-control { font-size: 0.9rem; padding: 8px 12px; }
+            .form-control:read-only { padding: 8px 12px; }
+            .input-group { margin-bottom: 12px; }
+            .btn-save { padding: 10px 16px; font-size: 0.85rem; width: 100%; margin-top: 8px; }
+            .btn-cancel { padding: 10px 16px; font-size: 0.85rem; width: 100%; }
+            .row { margin: 0; }
+            .col-md-6 { padding: 0; margin-bottom: 12px; }
+            .quick-link-card { padding: 12px; }
+            .quick-link-icon { width: 40px; height: 40px; font-size: 1.1rem; margin-bottom: 8px; }
+            .quick-link-label { font-size: 0.8rem; }
+            .rating-item { padding: 10px 12px; margin-bottom: 8px; }
+            .rating-stars { font-size: 0.9rem; }
+            .rating-comment { font-size: 0.8rem; }
+            .danger-zone { padding: 16px; }
+            .danger-zone h6 { font-size: 0.95rem; }
+            .danger-zone p { font-size: 0.85rem; }
+            .alert-success-custom, .alert-error-custom { font-size: 0.8rem; padding: 10px 12px; }
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg">
+    <div class="container">
+        <a class="navbar-brand" href="/"><i class="fas fa-utensils me-2" style="color:#ffd166"></i>Food<span>Delivery</span></a>
+        <div class="ms-auto d-flex align-items-center gap-3">
+            <a href="/" class="nav-link"><i class="fas fa-home me-1"></i>Home</a>
+            <a href="/user/cart.html" class="nav-link"><i class="fas fa-shopping-cart me-1"></i>Cart</a>
+            <a href="/user/orders.html" class="nav-link"><i class="fas fa-receipt me-1"></i>Orders</a>
+            <button class="btn btn-sm" style="background:rgba(255,255,255,.2);color:#fff;border:1px solid rgba(255,255,255,.4);border-radius:20px" onclick="logout()">
+                <i class="fas fa-sign-out-alt me-1"></i>Sign Out
+            </button>
+        </div>
+    </div>
+</nav>
+
+<!-- Profile Hero -->
+<div class="profile-hero">
+    <div class="container position-relative" style="z-index:2">
+        <div class="d-flex align-items-center gap-4">
+            <div class="avatar-wrapper">
+                <div class="avatar-circle" id="avatarInitial">?</div>
+            </div>
+            <div>
+                <div class="user-name-hero" id="heroName">Loading...</div>
+                <div class="user-email-hero" id="heroEmail"></div>
+                <span class="role-badge" id="heroBadge"><i class="fas fa-user me-1"></i>Member</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container profile-section pb-5">
+    <div class="row g-4">
+        <!-- Left: Quick links -->
+        <div class="col-lg-3">
+            <div class="row g-2 mb-3">
+                <div class="col-6">
+                    <a href="/user/cart.html" class="quick-link-card">
+                        <div class="quick-link-icon" style="background:#fff3f0"><i class="fas fa-shopping-cart" style="color:#e74c3c"></i></div>
+                        <div class="quick-link-label">Cart</div>
+                    </a>
+                </div>
+                <div class="col-6">
+                    <a href="/user/orders.html" class="quick-link-card">
+                        <div class="quick-link-icon" style="background:#e8f5e9"><i class="fas fa-receipt" style="color:#27ae60"></i></div>
+                        <div class="quick-link-label">Orders</div>
+                    </a>
+                </div>
+                <div class="col-6">
+                    <a href="/" class="quick-link-card">
+                        <div class="quick-link-icon" style="background:#fff8e1"><i class="fas fa-utensils" style="color:#e67e22"></i></div>
+                        <div class="quick-link-label">Menu</div>
+                    </a>
+                </div>
+                <div class="col-6">
+                    <a href="#" onclick="logout(); return false;" class="quick-link-card">
+                        <div class="quick-link-icon" style="background:#f3e5f5"><i class="fas fa-sign-out-alt" style="color:#8e44ad"></i></div>
+                        <div class="quick-link-label">Sign Out</div>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right: Tabs -->
+        <div class="col-lg-9">
+            <!-- Tab nav -->
+            <ul class="nav nav-tabs-custom mb-4" id="profileTabs">
+                <li class="nav-item"><a class="nav-link active" href="#" onclick="switchTab('info', this)"><i class="fas fa-user me-1"></i>Info</a></li>
+                <li class="nav-item"><a class="nav-link" href="#" onclick="switchTab('password', this)"><i class="fas fa-lock me-1"></i>Password</a></li>
+                <li class="nav-item"><a class="nav-link" href="#" onclick="switchTab('ratings', this)"><i class="fas fa-star me-1"></i>Reviews</a></li>
+            </ul>
+
+            <!-- Tab: Info -->
+            <div id="tab-info">
+                <div class="info-card">
+                    <div class="card-section-title"><i class="fas fa-user-edit"></i>Edit Information</div>
+                    <div id="infoAlert" class="d-none mb-3"></div>
+                    <form id="infoForm">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Username</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                    <input type="text" id="infoUsername" class="form-control" placeholder="Your name">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Email</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                    <input type="email" id="infoEmail" class="form-control" placeholder="email@example.com">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex gap-2 mt-4">
+                            <button type="submit" class="btn-save" id="saveInfoBtn">
+                                <span id="saveSpinner" class="spinner-border spinner-border-sm d-none me-2"></span>
+                                <i class="fas fa-save me-1"></i>Save Changes
+                            </button>
+                            <button type="button" class="btn-cancel" onclick="loadUserInfo()">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Tab: Password -->
+            <div id="tab-password" style="display:none">
+                <div class="info-card">
+                    <div class="card-section-title"><i class="fas fa-key"></i>Change Password</div>
+                    <div id="pwdAlert" class="d-none mb-3"></div>
+                    <form id="pwdForm">
+                        <div class="mb-3">
+                            <label class="form-label">New Password</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                <input type="password" id="newPwd" class="form-control" placeholder="Minimum 6 characters" minlength="6">
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label">Confirm New Password</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                <input type="password" id="confirmNewPwd" class="form-control" placeholder="Re-enter new password">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn-save" id="savePwdBtn">
+                            <span id="pwdSpinner" class="spinner-border spinner-border-sm d-none me-2"></span>
+                            <i class="fas fa-key me-1"></i>Change Password
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Tab: Ratings -->
+            <div id="tab-ratings" style="display:none">
+                <div class="info-card">
+                    <div class="card-section-title"><i class="fas fa-star"></i>My Reviews</div>
+                    <div id="ratingsList">
+                        <div class="text-center py-4 text-muted">
+                            <span class="spinner-border spinner-border-sm me-2"></span>Loading...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toast -->
+<div class="toast-container">
+    <div id="appToast" class="toast align-items-center" role="alert">
+        <div class="d-flex">
+            <div class="toast-body fw-500" id="toastMsg"></div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/js/api.js"></script>
+<script src="/js/auth.js"></script>
+<script>
+    const user = getCurrentUser();
+    if (!user) window.location.href = '/user/login.html';
+
+    function showToast(msg, type = 'success') {
+        const t = document.getElementById('appToast');
+        document.getElementById('toastMsg').textContent = msg;
+        t.className = `toast align-items-center ${type === 'error' ? 'toast-error' : 'toast-success'}`;
+        bootstrap.Toast.getOrCreateInstance(t, {delay: 2800}).show();
+    }
+
+    function switchTab(name, el) {
+        event.preventDefault();
+        ['info', 'password', 'ratings'].forEach(t => {
+            document.getElementById(`tab-${t}`).style.display = t === name ? '' : 'none';
+        });
+        document.querySelectorAll('.nav-tabs-custom .nav-link').forEach(l => l.classList.remove('active'));
+        el.classList.add('active');
+        if (name === 'ratings') loadRatings();
+    }
+
+    function getInitial(name) { return name ? name.charAt(0).toUpperCase() : '?'; }
+
+    async function loadUserInfo() {
+        try {
+            const res = await fetchAPI('/user');
+            const u = res.user;
+            // Hero
+            document.getElementById('heroName').textContent  = u.username || u.email;
+            document.getElementById('heroEmail').textContent = u.email;
+            document.getElementById('avatarInitial').textContent = getInitial(u.username || u.email);
+            const badge = document.getElementById('heroBadge');
+            badge.innerHTML = u.role === 'admin'
+                ? '<i class="fas fa-crown me-1"></i>Administrator'
+                : '<i class="fas fa-user me-1"></i>Member';
+            // Form
+            document.getElementById('infoUsername').value = u.username || '';
+            document.getElementById('infoEmail').value    = u.email || '';
+            // Sync localStorage
+            loginSuccess(u.token || user.token, {...user, username: u.username, email: u.email});
+        } catch(e) { showToast('Failed to load profile', 'error'); }
+    }
+
+    document.getElementById('infoForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const username = document.getElementById('infoUsername').value.trim();
+        const email    = document.getElementById('infoEmail').value.trim();
+        const alertBox = document.getElementById('infoAlert');
+        const btn      = document.getElementById('saveInfoBtn');
+        const spinner  = document.getElementById('saveSpinner');
+
+        btn.disabled = true; spinner.classList.remove('d-none');
+        alertBox.classList.add('d-none');
+
+        const payload = { user: {} };
+        if (username) payload.user.username = username;
+        if (email)    payload.user.email    = email;
+
+        try {
+            await fetchAPI('/user', 'PUT', payload);
+            alertBox.className = 'alert-success-custom p-3 mb-3';
+            alertBox.textContent = 'Profile updated successfully!';
+            alertBox.classList.remove('d-none');
+            showToast('Changes saved successfully!');
+            loadUserInfo();
+        } catch(err) {
+            alertBox.className = 'alert-error-custom p-3 mb-3';
+            alertBox.textContent = err.message || 'Update failed';
+            alertBox.classList.remove('d-none');
+        } finally {
+            btn.disabled = false; spinner.classList.add('d-none');
+        }
+    });
+
+    document.getElementById('pwdForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const newPwd     = document.getElementById('newPwd').value;
+        const confirmPwd = document.getElementById('confirmNewPwd').value;
+        const alertBox   = document.getElementById('pwdAlert');
+        const btn        = document.getElementById('savePwdBtn');
+        const spinner    = document.getElementById('pwdSpinner');
+
+        if (newPwd !== confirmPwd) {
+            alertBox.className = 'alert-error-custom p-3 mb-3';
+            alertBox.textContent = 'Passwords do not match!';
+            alertBox.classList.remove('d-none');
+            return;
+        }
+
+        btn.disabled = true; spinner.classList.remove('d-none');
+        alertBox.classList.add('d-none');
+
+        try {
+            await fetchAPI('/user', 'PUT', { user: { password: newPwd } });
+            alertBox.className = 'alert-success-custom p-3 mb-3';
+            alertBox.textContent = 'Password changed successfully!';
+            alertBox.classList.remove('d-none');
+            showToast('Password changed successfully!');
+            this.reset();
+        } catch(err) {
+            alertBox.className = 'alert-error-custom p-3 mb-3';
+            alertBox.textContent = err.message || 'Failed to change password';
+            alertBox.classList.remove('d-none');
+        } finally {
+            btn.disabled = false; spinner.classList.add('d-none');
+        }
+    });
+
+    async function loadRatings() {
+        const list = document.getElementById('ratingsList');
+        list.innerHTML = `<div class="text-center py-4 text-muted"><span class="spinner-border spinner-border-sm me-2"></span>Loading...</div>`;
+        try {
+            const res = await fetchAPI('/products/ratings');
+            const ratings = res.items || [];
+            const total = res.totalCount || (ratings && ratings.length) || 0;
+            if (!ratings.length) {
+                list.innerHTML = `<div class="text-center py-5 text-muted"><i class="fas fa-star fa-3x mb-3" style="opacity:.2"></i><p>You haven't reviewed anything yet</p><a href="/" style="color:#e74c3c;font-weight:600">Order and review now!</a></div>`;
+                return;
+            }
+            list.innerHTML = ratings.map(r => {
+                const stars = '★'.repeat(r.stars) + '☆'.repeat(5 - r.stars);
+                const productName = r.product_name;
+                return `
+                    <div class="rating-item">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div style="flex:1">
+                                <div style="font-weight:600;color:#2d3436;margin-bottom:4px">${productName}</div>
+                                <div class="rating-stars">${stars}</div>
+                                <div class="rating-comment">${r.comment || '<em class="text-muted">No comment</em>'}</div>
+                            </div>
+                        </div>
+                    </div>`;
+            }).join('');
+        } catch(e) {
+            console.error('Load ratings error:', e);
+            list.innerHTML = `<div class="text-center py-4 text-muted">Failed to load reviews: ${e.message || e}</div>`;
+        }
+    }
+
+    // Init
+    loadUserInfo();
+</script>
+</body>
+</html>

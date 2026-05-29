@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FoodDelivery - Order Delicious Food</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { font-family: 'Poppins', sans-serif; }
+
+        /* Navbar */
+        .navbar-brand-logo { font-weight: 800; font-size: 1.4rem; color: #fff; }
+        .navbar-brand-logo span { color: #ffd166; }
+        .navbar { background: linear-gradient(135deg, #c0392b, #e74c3c) !important; box-shadow: 0 2px 20px rgba(0,0,0,.25); }
+        .nav-link { color: rgba(255,255,255,.85) !important; font-weight: 500; transition: color .2s; }
+        .nav-link:hover { color: #ffd166 !important; }
+        .btn-cart { background: #ffd166; color: #333; border: none; font-weight: 600; border-radius: 20px; padding: 6px 16px; }
+        .btn-cart:hover { background: #ffc107; color: #333; }
+
+        /* Hero */
+        .hero-section {
+            background: linear-gradient(135deg, #c0392b 0%, #e74c3c 50%, #e67e22 100%);
+            min-height: 520px;
+            display: flex; align-items: center;
+            position: relative; overflow: hidden;
+        }
+        .hero-section::before {
+            content: ''; position: absolute; top: -50%; right: -10%;
+            width: 600px; height: 600px; border-radius: 50%;
+            background: rgba(255,255,255,.06);
+        }
+        .hero-section::after {
+            content: ''; position: absolute; bottom: -30%; left: -5%;
+            width: 400px; height: 400px; border-radius: 50%;
+            background: rgba(255,255,255,.04);
+        }
+        .hero-title { font-size: 3rem; font-weight: 800; color: #fff; line-height: 1.2; }
+        .hero-title span { color: #ffd166; }
+        .hero-subtitle { color: rgba(255,255,255,.85); font-size: 1.1rem; }
+        .btn-hero-primary { background: #ffd166; color: #333; font-weight: 700; border: none; border-radius: 30px; padding: 14px 36px; font-size: 1rem; transition: all .3s; }
+        .btn-hero-primary:hover { background: #ffc107; transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,.2); color: #333; }
+        .btn-hero-outline { border: 2px solid #fff; color: #fff; font-weight: 600; border-radius: 30px; padding: 12px 32px; transition: all .3s; }
+        .btn-hero-outline:hover { background: rgba(255,255,255,.15); color: #fff; transform: translateY(-2px); }
+        .hero-img { max-height: 380px; filter: drop-shadow(0 20px 40px rgba(0,0,0,.3)); animation: float 3s ease-in-out infinite; }
+        @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-12px)} }
+        .hero-badge { background: rgba(255,255,255,.2); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,.3); border-radius: 30px; padding: 8px 20px; display: inline-flex; align-items: center; gap: 8px; color: #fff; font-size: .85rem; margin-bottom: 24px; }
+
+        /* Search bar */
+        .search-section { background: #fff; padding: 24px 0; box-shadow: 0 4px 20px rgba(0,0,0,.08); }
+        .search-bar { border-radius: 50px; border: 2px solid #e74c3c; padding: 12px 24px; font-size: 1rem; }
+        .search-bar:focus { box-shadow: 0 0 0 3px rgba(231,76,60,.2); border-color: #e74c3c; outline: none; }
+        .btn-search { background: linear-gradient(135deg, #e74c3c, #c0392b); border: none; border-radius: 50px; padding: 12px 28px; color: #fff; font-weight: 600; transition: all .3s; }
+        .btn-search:hover { transform: scale(1.05); box-shadow: 0 6px 16px rgba(231,76,60,.4); color: #fff; }
+
+        /* Section title */
+        .section-title { font-size: 1.8rem; font-weight: 700; color: #2d3436; }
+        .section-title span { color: #e74c3c; }
+        .section-divider { width: 60px; height: 4px; background: linear-gradient(90deg, #e74c3c, #e67e22); border-radius: 2px; margin: 10px 0 32px; }
+
+        /* Category cards */
+        .category-card {
+            border: none; border-radius: 12px; overflow: hidden; cursor: pointer; transition: all .25s;
+            box-shadow: 0 4px 16px rgba(0,0,0,.08); text-align: center; background: #fff;
+            display:flex; flex-direction:column; align-items:center; justify-content:center;
+            aspect-ratio: 1 / 1; padding: 12px; gap: 8px;
+        }
+        .category-card:hover { transform: translateY(-6px); box-shadow: 0 12px 32px rgba(0,0,0,.12); }
+        .category-card.active { background: linear-gradient(135deg, #e74c3c, #c0392b); color: #fff; }
+        .category-card.active .cat-icon { background: rgba(255,255,255,.2); color: #fff; }
+        .cat-icon { width: 56px; height: 56px; border-radius: 10px; background: linear-gradient(135deg, #ffe3e0, #ffd4d0); display: flex; align-items: center; justify-content: center; font-size: 1.6rem; margin: 0; transition: all .25s; }
+        .cat-name { font-weight: 600; font-size: .95rem; color: #2d3436; margin: 0; }
+        .category-card.active .cat-name { color: #fff; }
+
+        /* Category list (vertical sidebar) */
+        .category-list {
+            display: flex; flex-direction: column; gap: 8px; width: 100%;
+        }
+        .category-list .cat-item {
+            display: flex; align-items: center; gap: 12px; padding: 12px 14px;
+            border-radius: 12px; cursor: pointer; transition: all .2s;
+            background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,.06);
+            border-left: 4px solid transparent; border: none; width: 100%; text-align: left;
+            font-family: 'Poppins', sans-serif; font-size: 1rem;
+        }
+        .category-list .cat-item:hover {
+            background: #fff3f0; box-shadow: 0 4px 16px rgba(0,0,0,.08); transform: translateX(4px);
+        }
+        .category-list .cat-item:focus { outline: none; box-shadow: 0 4px 16px rgba(0,0,0,.08); }
+        .category-list .cat-item.active {
+            background: linear-gradient(135deg, #ffe3e0, #fff3f0); color: #c0392b;
+            border-left-color: #e74c3c; box-shadow: 0 6px 20px rgba(231,76,60,.15); font-weight: 700;
+        }
+        .category-list .cat-icon {
+            width: 40px; height: 40px; border-radius: 8px; display:inline-flex;align-items:center;justify-content:center;
+            font-size: 1.3rem; background: linear-gradient(135deg, #ffe3e0, #ffd4d0); flex-shrink: 0;
+        }
+        .category-list .cat-item.active .cat-icon {
+            background: linear-gradient(135deg, #e74c3c, #c0392b); color: #fff;
+        }
+        .category-list .cat-name { font-size: .95rem; font-weight: 600; color: #2d3436; margin: 0; flex: 1; display: inline-block; }
+        .category-list .cat-item.active .cat-name { color: #c0392b; }
+        .category-list .cat-count {
+            font-size: .8rem; color: #636e72; font-weight: 600; background: #f5f5f5;
+            padding: 2px 8px; border-radius: 8px; margin-left: auto; display: inline-block;
+        }
+        .category-list .cat-item.active .cat-count { background: rgba(231,76,60,.1); color: #c0392b; }
+
+        /* Product card */
+        .product-card { border: none; border-radius: 20px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,.08); transition: all .3s; height: 100%; }
+        .product-card:hover { transform: translateY(-6px); box-shadow: 0 16px 40px rgba(0,0,0,.15); }
+        .product-card .card-img-top { height: 200px; object-fit: cover; transition: transform .4s; }
+        .product-card:hover .card-img-top { transform: scale(1.05); }
+        .product-card .card-body { padding: 16px; }
+        .product-card .card-title { font-weight: 700; font-size: 1rem; color: #2d3436; margin-bottom: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .product-card .cat-badge { background: #fff3f0; color: #e74c3c; font-size: .75rem; font-weight: 600; border-radius: 20px; padding: 3px 10px; border: 1px solid #ffd4d0; }
+        .product-card .price { font-size: 1.15rem; font-weight: 700; color: #e74c3c; }
+        .product-card .rating-stars { color: #ffc107; font-size: .85rem; }
+        .btn-add-cart { background: linear-gradient(135deg, #e74c3c, #c0392b); border: none; border-radius: 20px; color: #fff; font-weight: 600; font-size: .85rem; padding: 8px 18px; transition: all .3s; width: 100%; }
+        .btn-add-cart:hover { background: linear-gradient(135deg, #c0392b, #962d22); transform: scale(1.02); color: #fff; box-shadow: 0 4px 12px rgba(231,76,60,.4); }
+
+        /* Filter bar */
+        .filter-bar { background: #fff8f6; border-radius: 16px; padding: 16px 20px; margin-bottom: 24px; border: 1px solid #ffd4d0; }
+        .filter-label { font-weight: 600; color: #636e72; font-size: .85rem; }
+
+        /* Toast */
+        .toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 9999; }
+        .toast-success { background: linear-gradient(135deg, #00b894, #00cec9); color: #fff; border: none; border-radius: 12px; }
+
+        /* Product modal */
+        .modal-product-img { height: 280px; object-fit: cover; border-radius: 16px; }
+        .modal-price { font-size: 1.8rem; font-weight: 800; color: #e74c3c; }
+        .modal-rating { color: #ffc107; font-size: 1rem; }
+
+        /* Qty control */
+        .qty-control { display: flex; align-items: center; gap: 12px; }
+        .qty-btn { width: 36px; height: 36px; border-radius: 50%; border: 2px solid #e74c3c; background: #fff; color: #e74c3c; font-size: 1.1rem; font-weight: 700; cursor: pointer; transition: all .2s; display: flex; align-items: center; justify-content: center; }
+        .qty-btn:hover { background: #e74c3c; color: #fff; }
+        .qty-display { font-size: 1.1rem; font-weight: 700; min-width: 30px; text-align: center; }
+
+        /* Auth floating btn */
+        .nav-user-btn { background: rgba(255,255,255,.2); border: 1px solid rgba(255,255,255,.4); color: #fff !important; border-radius: 20px; padding: 6px 16px !important; font-size: .85rem !important; transition: all .2s; }
+        .nav-user-btn:hover { background: rgba(255,255,255,.35) !important; color: #fff !important; }
+
+        /* Footer */
+        footer { background: linear-gradient(135deg, #2d3436, #1a1a2e); color: rgba(255,255,255,.7); padding: 48px 0 24px; }
+        footer .footer-brand { font-size: 1.4rem; font-weight: 800; color: #fff; }
+        footer .footer-brand span { color: #ffd166; }
+        footer a { color: rgba(255,255,255,.6); text-decoration: none; transition: color .2s; }
+        footer a:hover { color: #ffd166; }
+        .footer-icon { color: #e74c3c; }
+        .social-link { width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,.1); display: inline-flex; align-items: center; justify-content: center; transition: all .2s; }
+        .social-link:hover { background: #e74c3c; color: #fff !important; }
+
+        /* Skeleton */
+        .skeleton { background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 8px; }
+        @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+
+        /* Mobile Responsive Design */
+        @media (max-width: 992px) {
+            .hero-section { min-height: 400px; }
+            .hero-title { font-size: 2rem; }
+            .hero-img { max-height: 280px; }
+            .navbar-brand-logo { font-size: 1.1rem; }
+            .section-title { font-size: 1.5rem; }
+        }
+
+        @media (max-width: 768px) {
+            .hero-section { min-height: 300px; padding: 40px 0; }
+            .hero-section::before { width: 300px; height: 300px; top: -30%; right: -5%; }
+            .hero-section::after { width: 200px; height: 200px; bottom: -20%; left: -5%; }
+            .hero-title { font-size: 1.5rem; line-height: 1.3; }
+            .hero-subtitle { font-size: 0.95rem; }
+            .btn-hero-primary, .btn-hero-outline { padding: 10px 24px; font-size: 0.9rem; }
+            .d-flex.gap-3 { flex-direction: column !important; }
+            .d-flex.gap-3 a { width: 100%; text-align: center; }
+            .col-lg-6 { margin-bottom: 20px; }
+            .hero-img { max-height: 200px; }
+            .navbar-brand-logo { font-size: 1rem; }
+            .nav-link { font-size: 0.9rem; }
+            .section-title { font-size: 1.3rem; }
+            .section-divider { margin-bottom: 24px; }
+            .search-bar { padding: 10px 16px; font-size: 0.9rem; }
+            .btn-search { padding: 10px 20px; font-size: 0.9rem; }
+            .category-card { aspect-ratio: auto; padding: 16px 12px; min-height: 100px; gap: 6px; }
+            .cat-icon { width: 48px; height: 48px; font-size: 1.4rem; }
+            .cat-name { font-size: 0.85rem; }
+            .category-grid { gap: 12px; }
+            .product-card { border-radius: 10px; }
+            .product-img { max-height: 150px; }
+            .product-name { font-size: 0.9rem; }
+            .product-price { font-size: 0.85rem; }
+        }
+
+        @media (max-width: 576px) {
+            .hero-section { min-height: 250px; padding: 30px 0; }
+            .hero-section::before { width: 200px; height: 200px; }
+            .hero-section::after { display: none; }
+            .hero-title { font-size: 1.2rem; }
+            .hero-subtitle { font-size: 0.85rem; margin-top: 12px; margin-bottom: 16px; }
+            .hero-badge { font-size: 0.75rem; padding: 6px 14px; margin-bottom: 16px; }
+            .btn-hero-primary, .btn-hero-outline { padding: 8px 20px; font-size: 0.85rem; }
+            .hero-img { max-height: 150px; margin-top: 20px; }
+            .navbar-brand-logo { font-size: 0.9rem; }
+            .nav-item { margin-bottom: 8px; }
+            .nav-link { padding: 8px 0 !important; }
+            .container { padding: 0 12px; }
+            .section-title { font-size: 1.2rem; }
+            .section-divider { margin-bottom: 20px; }
+            .search-bar { padding: 8px 12px; font-size: 0.85rem; }
+            .btn-search { padding: 8px 16px; font-size: 0.85rem; }
+            .search-section { padding: 16px 0; }
+            .category-card { aspect-ratio: auto; padding: 12px 8px; min-height: 80px; }
+            .cat-icon { width: 40px; height: 40px; font-size: 1.2rem; }
+            .cat-name { font-size: 0.8rem; }
+            .category-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+            .category-list .cat-item { padding: 10px 12px; font-size: 0.9rem; }
+            .category-list .cat-icon { width: 36px; height: 36px; font-size: 1.1rem; }
+            .product-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+            .product-card { padding: 10px; border-radius: 8px; }
+            .product-img { max-height: 120px; }
+            .product-name { font-size: 0.85rem; }
+            .product-price { font-size: 0.8rem; }
+            .btn-add-cart { padding: 6px 12px; font-size: 0.8rem; }
+            footer { padding: 24px 0; font-size: 0.85rem; }
+        }
+
+        @media (max-width: 360px) {
+            .hero-title { font-size: 1rem; }
+            .hero-subtitle { font-size: 0.75rem; }
+            .btn-hero-primary, .btn-hero-outline { padding: 6px 16px; font-size: 0.75rem; }
+            .category-grid { grid-template-columns: repeat(2, 1fr); }
+            .product-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg">
+    <div class="container">
+        <a class="navbar-brand-logo" href="/"><i class="fas fa-utensils me-2" style="color:#ffd166"></i>Food<span>Delivery</span></a>
+        <button class="navbar-toggler border-0 text-white" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+            <i class="fas fa-bars"></i>
+        </button>
+        <div class="collapse navbar-collapse" id="navMenu">
+            <ul class="navbar-nav me-auto ms-4">
+                <li class="nav-item"><a class="nav-link" href="#catalog"><i class="fas fa-pizza-slice me-1"></i>Menu</a></li>
+                <li class="nav-item"><a class="nav-link" href="#catalog"><i class="fas fa-th-large me-1"></i>Categories</a></li>
+            </ul>
+            <div class="d-flex align-items-center gap-2" id="navAuthArea">
+                <a href="/user/login.html" class="nav-link nav-user-btn"><i class="fas fa-sign-in-alt me-1"></i>Log in</a>
+                <a href="/user/register.html" class="btn btn-cart"><i class="fas fa-user-plus me-1"></i>Register</a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container position-relative" style="z-index:2">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <div class="hero-badge">
+                    <i class="fas fa-star" style="color:#ffd166"></i>
+                    500+ Delicious Dishes Every Day
+                </div>
+                <h1 class="hero-title">Order Delicious Food<br>Delivered <span>to Your Door</span></h1>
+                <p class="hero-subtitle mt-3 mb-4">Discover hundreds of dishes from trusted restaurants. Fast, convenient, and delicious!</p>
+                <div class="d-flex gap-3 flex-wrap">
+                    <a href="#catalog" class="btn btn-hero-primary">
+                        <i class="fas fa-utensils me-2"></i>Order Now
+                    </a>
+                    <a href="#catalog" class="btn btn-hero-outline">
+                        <i class="fas fa-compass me-2"></i>Explore
+                    </a>
+                </div>
+                <div class="d-flex gap-4 mt-4">
+                    <div class="text-white"><div style="font-size:1.6rem;font-weight:800">500+</div><div style="font-size:.8rem;opacity:.8">Món ăn</div></div>
+                    <div class="text-white"><div style="font-size:1.6rem;font-weight:800">50+</div><div style="font-size:.8rem;opacity:.8">Categories</div></div>
+                    <div class="text-white"><div style="font-size:1.6rem;font-weight:800">4.8★</div><div style="font-size:.8rem;opacity:.8">Rating</div></div>
+                </div>
+            </div>
+            <div class="col-lg-6 text-center d-none d-lg-block">
+                <img src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=500&q=80" class="hero-img img-fluid" alt="Food">
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Search Bar -->
+<section class="search-section">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-7">
+                <div class="input-group">
+                    <input type="text" id="searchInput" class="form-control search-bar border-end-0" placeholder="Search for your favourite dish...">
+                    <button class="btn btn-search" onclick="searchProducts()">
+                        <i class="fas fa-search me-1"></i>Search
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Combined Categories + Products -->
+<section id="catalog" class="py-5">
+    <div class="container">
+        <div class="row">
+            <!-- Categories column (2/12) -->
+                <div class="col-12 col-lg-2 mb-4 mb-lg-0">
+                <h5 class="section-title mb-3">Categories</h5>
+                <div class="section-divider"></div>
+                <div id="categoryList" class="category-list"></div>
+            </div>
+
+            <!-- Products column (10/12) -->
+                <div class="col-12 col-lg-10">
+                <h2 class="section-title">Today's <span>Menu</span></h2>
+                <div class="section-divider"></div>
+
+                <!-- Filter bar -->
+                <div class="filter-bar d-flex gap-3 align-items-center flex-wrap">
+                    <span class="filter-label"><i class="fas fa-sliders-h me-1"></i>Filters:</span>
+                    <!-- category select removed -->
+                    <input type="number" id="minPrice" class="form-control form-control-sm" style="width:110px;border-radius:20px;border-color:#ffd4d0" placeholder="From ($)">
+                    <input type="number" id="maxPrice" class="form-control form-control-sm" style="width:110px;border-radius:20px;border-color:#ffd4d0" placeholder="To ($)">
+                    <select id="minRating" class="form-select form-select-sm" style="width:120px;border-radius:20px">
+                        <option value="">Min rating</option>
+                        <option value="1">1★</option>
+                        <option value="2">2★</option>
+                        <option value="3">3★</option>
+                        <option value="4">4★</option>
+                        <option value="5">5★</option>
+                    </select>
+                    <select id="sortSelect" class="form-select form-select-sm" style="width:160px;border-radius:20px">
+                        <option value="">Sort</option>
+                        <option value="name_asc">Name A-Z</option>
+                        <option value="name_desc">Name Z-A</option>
+                        <option value="price_asc">Price ↑</option>
+                        <option value="price_desc">Price ↓</option>
+                        <option value="rating_desc">Top Rated</option>
+                    </select>
+                    <button class="btn btn-sm btn-search" onclick="applyFilters()">Apply</button>
+                    <button class="btn btn-sm btn-outline-secondary rounded-pill" onclick="resetFilters()">Reset</button>
+                    <span id="resultCount" class="ms-auto text-muted small fw-600"></span>
+                </div>
+
+                <div class="row g-4" id="productGrid">
+                    <!-- Skeleton placeholders -->
+                    <div class="col-md-3 col-sm-6"><div class="skeleton" style="height:320px;border-radius:20px"></div></div>
+                    <div class="col-md-3 col-sm-6"><div class="skeleton" style="height:320px;border-radius:20px"></div></div>
+                    <div class="col-md-3 col-sm-6"><div class="skeleton" style="height:320px;border-radius:20px"></div></div>
+                    <div class="col-md-3 col-sm-6"><div class="skeleton" style="height:320px;border-radius:20px"></div></div>
+                </div>
+                <div class="text-center mt-4" id="paginationArea"></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Product Detail Modal -->
+<div class="modal fade" id="productModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0" style="border-radius:24px;overflow:hidden">
+            <div class="modal-header border-0 pb-0">
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="row g-4">
+                    <div class="col-md-5">
+                        <img id="modalImg" src="" class="modal-product-img w-100" alt="">
+                    </div>
+                    <div class="col-md-7">
+                        <span id="modalCategory" class="badge mb-2" style="background:#fff3f0;color:#e74c3c;border:1px solid #ffd4d0;font-size:.8rem"></span>
+                        <h3 id="modalName" class="fw-bold" style="color:#2d3436"></h3>
+                        <div class="modal-rating mb-2" id="modalRating"></div>
+                        <p id="modalDesc" class="text-muted small"></p>
+                        <div class="modal-price mb-3" id="modalPrice"></div>
+                        <div class="qty-control mb-4">
+                            <button class="qty-btn" onclick="changeQty(-1)">−</button>
+                            <span class="qty-display" id="qtyDisplay">1</span>
+                            <button class="qty-btn" onclick="changeQty(1)">+</button>
+                        </div>
+                        <button class="btn-add-cart py-2 px-4 w-auto" onclick="addToCartFromModal()" style="border-radius:30px">
+                            <i class="fas fa-cart-plus me-2"></i>Add to Cart
+                        </button>
+                        <!-- Rating section (shown if logged in & already rated) -->
+                        <div id="ratingSection" class="mt-4 d-none">
+                            <hr>
+                            <h6 class="fw-bold">Your Review</h6>
+                            <div id="existingRating"></div>
+                            <div id="ratingForm">
+                                <div class="d-flex gap-1 mb-2" id="starPicker">
+                                    <span class="star-pick fs-4" data-val="1" style="cursor:pointer">☆</span>
+                                    <span class="star-pick fs-4" data-val="2" style="cursor:pointer">☆</span>
+                                    <span class="star-pick fs-4" data-val="3" style="cursor:pointer">☆</span>
+                                    <span class="star-pick fs-4" data-val="4" style="cursor:pointer">☆</span>
+                                    <span class="star-pick fs-4" data-val="5" style="cursor:pointer">☆</span>
+                                </div>
+                                <textarea id="ratingComment" class="form-control form-control-sm mb-2" rows="2" placeholder="Write your review..."></textarea>
+                                <button class="btn btn-sm" style="background:#e74c3c;color:#fff;border-radius:20px" onclick="submitRating()">Submit Review</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Product Detail Modal -->
+<footer>
+    <div class="container">
+        <div class="row g-4 mb-4">
+            <div class="col-md-4">
+                <div class="footer-brand mb-3"><i class="fas fa-utensils me-2"></i>Food<span>Delivery</span></div>
+                <p style="font-size:.9rem">The leading online food ordering platform. Fast, convenient, and quality-assured.</p>
+                <div class="d-flex gap-2 mt-3">
+                    <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <h6 class="text-white fw-600 mb-3">Navigation</h6>
+                <ul class="list-unstyled" style="font-size:.9rem">
+                    <li class="mb-2"><a href="/">Home</a></li>
+                    <li class="mb-2"><a href="#products">Menu</a></li>
+                    <li class="mb-2"><a href="#categories">Categories</a></li>
+                </ul>
+            </div>
+            <div class="col-md-3">
+                <h6 class="text-white fw-600 mb-3">Account</h6>
+                <ul class="list-unstyled" style="font-size:.9rem">
+                    <li class="mb-2"><a href="/user/login.html">Log in</a></li>
+                    <li class="mb-2"><a href="/user/register.html">Register</a></li>
+                    <li class="mb-2"><a href="/user/profile.html">Profile</a></li>
+                    <li class="mb-2"><a href="/user/orders.html">Order History</a></li>
+                </ul>
+            </div>
+            <div class="col-md-3">
+                <h6 class="text-white fw-600 mb-3">Contact</h6>
+                <p style="font-size:.9rem"><i class="fas fa-phone footer-icon me-2"></i>1800-FOOD-DEL</p>
+                <p style="font-size:.9rem"><i class="fas fa-envelope footer-icon me-2"></i>support@fooddelivery.vn</p>
+                <p style="font-size:.9rem"><i class="fas fa-map-marker-alt footer-icon me-2"></i>Ho Chi Minh City, VN</p>
+            </div>
+        </div>
+        <hr style="border-color:rgba(255,255,255,.15)">
+        <p class="text-center mb-0" style="font-size:.85rem">© 2026 FoodDelivery. All rights reserved.</p>
+    </div>
+</footer>
+
+<!-- Toast -->
+<div class="toast-container">
+    <div id="appToast" class="toast align-items-center toast-success" role="alert">
+        <div class="d-flex">
+            <div class="toast-body fw-500" id="toastMsg"></div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/js/api.js"></script>
+<script src="/js/auth.js"></script>
+<script>
+    const ICONS = ['🍔','🍕','🍜','🍣','🥗','🍰','🥤','🌮','🍱','🍛'];
+    let currentPage = 1;
+    const PAGE_LIMIT = 8;
+    let activeCategoryID = 0;
+    let currentProductID = null;
+    let selectedStars = 0;
+    let currentQty = 1;
+
+    // --- Auth UI ---
+    function updateNavAuth() {
+        const user = getCurrentUser();
+        const area = document.getElementById('navAuthArea');
+            if (user) {
+            area.innerHTML = `
+                <a href="/user/cart.html" class="nav-link nav-user-btn"><i class="fas fa-shopping-cart me-1"></i>Cart</a>
+                <a href="/user/orders.html" class="nav-link nav-user-btn"><i class="fas fa-receipt me-1"></i>Orders</a>
+                <div class="dropdown">
+                    <button class="btn btn-cart dropdown-toggle" data-bs-toggle="dropdown">
+                        <i class="fas fa-user me-1"></i>${user.username || user.email}
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="/user/profile.html"><i class="fas fa-user-cog me-2"></i>Profile</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item text-danger" href="#" onclick="logout()"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                    </ul>
+                </div>`;
+        }
+    }
+
+    // --- Toast ---
+    function showToast(msg, type = 'success') {
+        const t = document.getElementById('appToast');
+        document.getElementById('toastMsg').textContent = msg;
+        t.className = `toast align-items-center ${type === 'error' ? 'bg-danger text-white' : 'toast-success'}`;
+        bootstrap.Toast.getOrCreateInstance(t, {delay: 2500}).show();
+    }
+
+    // --- Categories ---
+    async function loadCategories() {
+        try {
+            const res = await fetchAPI('/categories?page=1&limit=50');
+            const list = document.getElementById('categoryList');
+            list.innerHTML = '';
+            // Add default "All" category
+            const allItem = document.createElement('button');
+            allItem.type = 'button';
+            allItem.className = 'cat-item active';
+            allItem.innerHTML = `<div class="cat-icon">🍽️</div><div class="cat-name">All</div>`;
+            allItem.addEventListener('click', function() { filterByCategory(0, this); });
+            list.appendChild(allItem);
+            const cats = res.items || [];
+            cats.forEach((cat, i) => {
+                const item = document.createElement('button');
+                item.type = 'button';
+                item.className = 'cat-item';
+                const countHtml = cat.count ? `<div class="cat-count">(${cat.count})</div>` : '';
+                item.innerHTML = `<div class="cat-icon">${ICONS[(i+1) % ICONS.length]}</div><div class="cat-name">${cat.name}</div>${countHtml}`;
+                const catId = cat.id;
+                item.addEventListener('click', function() { filterByCategory(catId, this); });
+                list.appendChild(item);
+            });
+        } catch(e) { console.error('Load categories error:', e); }
+    }
+
+    function filterByCategory(id, el) {
+        activeCategoryID = id;
+        document.querySelectorAll('.cat-item').forEach(c => c.classList.remove('active'));
+        el.classList.add('active');
+        currentPage = 1;
+        loadProducts();
+    }
+
+    // --- Products ---
+    async function loadProducts() {
+        const globalSearchEl = document.getElementById('searchInput');
+        const search = globalSearchEl ? globalSearchEl.value : '';
+        const sortEl = document.getElementById('sortSelect');
+        const sort   = sortEl ? sortEl.value : '';
+        const min    = document.getElementById('minPrice').value;
+        const max    = document.getElementById('maxPrice').value;
+        const minRatingEl = document.getElementById('minRating');
+        const minRating = minRatingEl ? minRatingEl.value : '';
+
+        let url = `/products?page=${currentPage}&limit=${PAGE_LIMIT}`;
+        if (activeCategoryID) url += `&category_id=${activeCategoryID}`;
+        if (search) url += `&search=${encodeURIComponent(search)}`;
+        if (sort)   url += `&sort=${sort}`;
+        if (min)    url += `&min_price=${min}`;
+        if (max)    url += `&max_price=${max}`;
+        if (minRating) url += `&min_rating=${minRating}`;
+
+        try {
+            const res = await fetchAPI(url);
+            const products = res.items || [];
+            const total    = res.totalCount || 0;
+            renderProducts(products);
+            renderPagination(total);
+            document.getElementById('resultCount').textContent = `${total} dishes`;
+        } catch(e) {
+            document.getElementById('productGrid').innerHTML = `<div class="col-12 text-center py-5 text-muted"><i class="fas fa-exclamation-circle fa-2x mb-3"></i><p>Unable to load products</p></div>`;
+        }
+    }
+
+    function renderProducts(products) {
+        const grid = document.getElementById('productGrid');
+        if (!products.length) {
+            grid.innerHTML = `<div class="col-12 text-center py-5 text-muted"><i class="fas fa-search fa-3x mb-3"></i><p class="fs-5">No dishes found</p></div>`;
+            return;
+        }
+        grid.innerHTML = products.map(p => {
+            const img = p.image || 'https://placehold.co/300x200?text=Food';
+            const stars = '★'.repeat(Math.round(p.rating || 0)) + '☆'.repeat(5 - Math.round(p.rating || 0));
+            return `
+                <div class="col-lg-3 col-md-4 col-sm-6">
+                    <div class="product-card card" onclick="openProductModal(${p.id})" style="cursor:pointer">
+                        <div style="overflow:hidden">
+                            <img src="${img}" class="card-img-top" alt="${p.name}">
+                        </div>
+                        <div class="card-body d-flex flex-column">
+                            <span class="cat-badge mb-2">${p.category?.name || ''}</span>
+                            <h6 class="card-title" title="${p.name}">${p.name}</h6>
+                            <div class="rating-stars mb-1">${stars} <small class="text-muted">(${(p.rating||0).toFixed(1)})</small></div>
+                            <div class="d-flex align-items-center justify-content-between mt-auto pt-2">
+                                <span class="price">$${p.price.toFixed(2)}</span>
+                                <button class="btn btn-sm btn-add-cart" style="width:auto;padding:6px 14px" onclick="event.stopPropagation();quickAddToCart(${p.id}, '${p.name}')">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+        }).join('');
+    }
+
+    function renderPagination(total) {
+        const totalPages = Math.ceil(total / PAGE_LIMIT);
+        const area = document.getElementById('paginationArea');
+        if (totalPages <= 1) { area.innerHTML = ''; return; }
+        let html = '<ul class="pagination justify-content-center">';
+        html += `<li class="page-item ${currentPage===1?'disabled':''}"><button class="page-link" onclick="goPage(${currentPage-1})">‹</button></li>`;
+        for (let i = 1; i <= totalPages; i++) {
+            html += `<li class="page-item ${i===currentPage?'active':''}"><button class="page-link" onclick="goPage(${i})">${i}</button></li>`;
+        }
+        html += `<li class="page-item ${currentPage===totalPages?'disabled':''}"><button class="page-link" onclick="goPage(${currentPage+1})">›</button></li></ul>`;
+        area.innerHTML = html;
+    }
+
+    function goPage(p) {
+        currentPage = p; loadProducts();
+        const target = document.getElementById('catalog') || document.getElementById('productGrid');
+        if (target) window.scrollTo({top: target.offsetTop - 80, behavior:'smooth'});
+    }
+    function searchProducts() { currentPage = 1; loadProducts(); }
+    function applyFilters()  { currentPage = 1; loadProducts(); }
+    function resetFilters()  {
+        document.getElementById('minPrice').value = '';
+        document.getElementById('maxPrice').value = '';
+        const globalSearch = document.getElementById('searchInput'); if (globalSearch) globalSearch.value = '';
+        const sortEl = document.getElementById('sortSelect'); if (sortEl) sortEl.value = '';
+        const minRatingEl = document.getElementById('minRating'); if (minRatingEl) minRatingEl.value = '';
+        currentPage = 1; activeCategoryID = 0;
+        document.querySelectorAll('.cat-item').forEach((c,i)=> i===0 ? c.classList.add('active') : c.classList.remove('active'));
+        loadProducts();
+    }
+
+    // --- Product Modal ---
+    async function openProductModal(id) {
+        currentProductID = id; currentQty = 1;
+        document.getElementById('qtyDisplay').textContent = 1;
+        try {
+            const res = await fetchAPI(`/products/${id}`);
+            const p = res.product || res;
+            const img = p.image || 'https://placehold.co/400x300?text=Food';
+            const stars = '★'.repeat(Math.round(p.rating||0)) + '☆'.repeat(5-Math.round(p.rating||0));
+            document.getElementById('modalImg').src = img;
+            document.getElementById('modalName').textContent = p.name;
+            document.getElementById('modalCategory').textContent = p.category?.name || '';
+            document.getElementById('modalDesc').textContent = p.description || 'No description.';
+            document.getElementById('modalPrice').textContent = `$${p.price.toFixed(2)}`;
+            document.getElementById('modalRating').innerHTML = `<span style="color:#ffc107">${stars}</span> <small class="text-muted">${(p.rating||0).toFixed(1)}</small>`;
+            const user = getCurrentUser();
+            if (user) {
+                document.getElementById('ratingSection').classList.remove('d-none');
+                loadUserRating(id);
+            }
+            bootstrap.Modal.getOrCreateInstance(document.getElementById('productModal')).show();
+        } catch(e) { showToast('Unable to load product details', 'error'); }
+    }
+
+    async function loadUserRating(productId) {
+        try {
+            const res = await fetchAPI(`/products/${productId}/rating`);
+            if (res.rating && res.rating.stars) {
+                document.getElementById('existingRating').innerHTML = `<p class="text-muted small mb-2">You rated: ${'★'.repeat(res.rating.stars)} — "${res.rating.comment}"</p>`;
+                document.getElementById('ratingForm').classList.add('d-none');
+            }
+        } catch(e) { /* not rated yet */ }
+    }
+
+    function changeQty(delta) {
+        currentQty = Math.max(1, currentQty + delta);
+        document.getElementById('qtyDisplay').textContent = currentQty;
+    }
+
+    // Star picker
+    document.querySelectorAll('.star-pick').forEach(s => {
+        s.addEventListener('click', function() {
+            selectedStars = +this.dataset.val;
+            document.querySelectorAll('.star-pick').forEach((x, i) => x.textContent = i < selectedStars ? '★' : '☆');
+        });
+    });
+
+    async function submitRating() {
+        if (!selectedStars) return showToast('Please select a star rating', 'error');
+        const comment = document.getElementById('ratingComment').value;
+        try {
+            await fetchAPI(`/products/${currentProductID}/rating`, 'POST', {stars: selectedStars, comment});
+            showToast('Review submitted successfully!');
+            document.getElementById('ratingForm').classList.add('d-none');
+            document.getElementById('existingRating').innerHTML = `<p class="text-muted small">Thank you for your review: ${'★'.repeat(selectedStars)}</p>`;
+        } catch(e) { showToast(e.message || 'Failed to submit review', 'error'); }
+    }
+
+    async function addToCartFromModal() {
+        const user = getCurrentUser();
+        if (!user) return window.location.href = '/user/login.html';
+        try {
+            await fetchAPI('/cart', 'POST', {product_id: currentProductID, quantity: currentQty});
+            showToast(`Added ${currentQty} item(s) to cart!`);
+            bootstrap.Modal.getInstance(document.getElementById('productModal')).hide();
+        } catch(e) { showToast(e.message || 'Failed to add to cart', 'error'); }
+    }
+
+    async function quickAddToCart(productId, name) {
+        const user = getCurrentUser();
+        if (!user) return window.location.href = '/user/login.html';
+        try {
+            await fetchAPI('/cart', 'POST', {product_id: productId, quantity: 1});
+            showToast(`Added "${name}" to cart!`);
+        } catch(e) { showToast(e.message || 'Failed to add to cart', 'error'); }
+    }
+
+    // Enter key search
+    const globalSearchEl = document.getElementById('searchInput');
+    if (globalSearchEl) globalSearchEl.addEventListener('keydown', e => { if (e.key === 'Enter') searchProducts(); });
+
+    // Init
+    updateNavAuth();
+    loadCategories();
+    loadProducts();
+</script>
+</body>
+</html>

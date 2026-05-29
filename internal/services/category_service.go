@@ -9,10 +9,10 @@ import (
 )
 
 type CategoryService interface {
-	CreateCategory(req requests.CreateCategoryRequest) (*entities.Category, error)
-	UpdateCategory(id uint, req requests.UpdateCategoryRequest) (*entities.Category, error)
+	CreateCategory(req requests.CreateCategoryRequest) (*responses.CategoryResponse, error)
+	UpdateCategory(id uint, req requests.UpdateCategoryRequest) (*responses.CategoryResponse, error)
 	DeleteCategory(id uint) error
-	GetCategories(page, limit int) (responses.ListResponse[*entities.Category], error)
+	GetCategories(page, limit int) (responses.ListResponse[*responses.CategoryResponse], error)
 }
 
 type categoryService struct {
@@ -23,7 +23,7 @@ func NewCategoryService(repo repositories.CategoryRepository) CategoryService {
 	return &categoryService{repo: repo}
 }
 
-func (s *categoryService) CreateCategory(req requests.CreateCategoryRequest) (*entities.Category, error) {
+func (s *categoryService) CreateCategory(req requests.CreateCategoryRequest) (*responses.CategoryResponse, error) {
 	if ex, _ := s.repo.FindByName(req.Name); ex != nil {
 		return nil, configs.CategoryAlreadyExists
 	}
@@ -37,10 +37,14 @@ func (s *categoryService) CreateCategory(req requests.CreateCategoryRequest) (*e
 		return nil, configs.CreateCategoryFailed
 	}
 
-	return category, nil
+	return &responses.CategoryResponse{
+		ID:          int(category.ID),
+		Name:        category.Name,
+		Description: category.Description,
+	}, nil
 }
 
-func (s *categoryService) UpdateCategory(id uint, req requests.UpdateCategoryRequest) (*entities.Category, error) {
+func (s *categoryService) UpdateCategory(id uint, req requests.UpdateCategoryRequest) (*responses.CategoryResponse, error) {
 	category, err := s.repo.FindByID(id)
 	if err != nil {
 		return nil, configs.CategoryNotFound
@@ -57,7 +61,11 @@ func (s *categoryService) UpdateCategory(id uint, req requests.UpdateCategoryReq
 		return nil, configs.UpdateCategoryFailed
 	}
 
-	return category, nil
+	return &responses.CategoryResponse{
+		ID:          int(category.ID),
+		Name:        category.Name,
+		Description: category.Description,
+	}, nil
 }
 
 func (s *categoryService) DeleteCategory(id uint) error {
@@ -69,14 +77,23 @@ func (s *categoryService) DeleteCategory(id uint) error {
 	return s.repo.Delete(category)
 }
 
-func (s *categoryService) GetCategories(page, limit int) (responses.ListResponse[*entities.Category], error) {
+func (s *categoryService) GetCategories(page, limit int) (responses.ListResponse[*responses.CategoryResponse], error) {
 	categories, totalCount, err := s.repo.List(page, limit)
 	if err != nil {
-		return responses.ListResponse[*entities.Category]{}, err
+		return responses.ListResponse[*responses.CategoryResponse]{}, err
 	}
 
-	return responses.ListResponse[*entities.Category]{
-		Items:      categories,
+	categoryResponses := make([]*responses.CategoryResponse, len(categories))
+	for i, category := range categories {
+		categoryResponses[i] = &responses.CategoryResponse{
+			ID:          int(category.ID),
+			Name:        category.Name,
+			Description: category.Description,
+		}
+	}
+
+	return responses.ListResponse[*responses.CategoryResponse]{
+		Items:      categoryResponses,
 		TotalCount: totalCount,
 	}, nil
 }
