@@ -82,10 +82,15 @@ func (s *ratingService) GetRatingsByUserID(userID uint, page, limit int) (*respo
 
 	var ratingResponses []*responses.RatingResponseData
 	for _, rating := range ratings {
+		productName := ""
+		if rating.Product != nil {
+			productName = rating.Product.Name
+		}
 		ratingResponses = append(ratingResponses, &responses.RatingResponseData{
-			ProductID: rating.ProductID,
-			Stars:     rating.Stars,
-			Comment:   rating.Comment,
+			ProductID:   rating.ProductID,
+			ProductName: productName,
+			Stars:       rating.Stars,
+			Comment:     rating.Comment,
 		})
 	}
 

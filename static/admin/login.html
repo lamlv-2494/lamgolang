@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - Food Delivery</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light d-flex align-items-center" style="height: 100vh;">
+
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-4">
+                <div class="card shadow-sm">
+                    <div class="card-body p-4">
+                        <h3 class="text-center mb-4">Admin Portal</h3>
+                        
+                        <div id="error-msg" class="alert alert-danger d-none" role="alert"></div>
+
+                        <form id="loginForm">
+                            <div class="mb-3">
+                                <label class="form-label">Email Address</label>
+                                <input type="email" id="email" class="form-control" required placeholder="admin@fooddelivery.com">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Password</label>
+                                <input type="password" id="password" class="form-control" required placeholder="••••••••">
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100">Sign In</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/api.js"></script>
+    <script src="../js/auth.js"></script>
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault(); // Intercept default browser form submission refresh behavior
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const errorBox = document.getElementById('error-msg');
+            
+            try {
+                // Execute centralized fetch call against backend login controller
+                const response = await fetchAPI('/user/login', 'POST', { email, password });
+                
+                // FIXED: Extract using '.user' to accurately match your Go UserResponse JSON struct tags
+                const user = response.user; 
+
+                // Guard clause targeting missing authorization scope roles
+                if (!user || user.role !== 'admin') {
+                    throw new Error("This account does not have Administrator privileges!");
+                }
+
+                // Persist state tokens into localStorage
+                loginSuccess(user.token, user);
+
+                // Redirect to the core administrative index view
+                window.location.href = '/admin/categories.html';
+
+            } catch (error) {
+                // FIXED: Surface errors cleanly without accidentally deleting the error DOM element
+                errorBox.textContent = error.message;
+                errorBox.classList.remove('d-none');
+            }
+        });
+    </script>
+</body>
+</html>

@@ -49,7 +49,12 @@ func (r *ratingRepository) GetRatingsByUserID(userID uint, page, limit int) ([]*
 		return nil, 0, err
 	}
 
-	err = r.db.Where("user_id = ?", userID).Offset((page - 1) * limit).Limit(limit).Find(&ratings).Error
+	err = r.db.
+		Preload("Product").
+		Where("user_id = ?", userID).
+		Offset((page - 1) * limit).
+		Limit(limit).
+		Find(&ratings).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, totalCount, nil

@@ -8,6 +8,7 @@ import (
 	"food_delivery/internal/services"
 	"food_delivery/internal/utils/constants"
 	"log"
+	"net/http"
 	"os"
 
 	"github.com/gin-gonic/gin"
@@ -55,6 +56,8 @@ func main() {
 
 	r := gin.Default()
 
+	r.Static("/uploads", "./uploads")
+
 	api := r.Group("/api")
 	{
 		// Common
@@ -72,6 +75,10 @@ func main() {
 		// Admin
 		routes.RegisterAdminRoutes(api, adminHandlers)
 	}
+
+	staticDir := "./static"
+	// Fallback routing to serve static frontend files when no API route matches
+	r.NoRoute(gin.WrapH(http.FileServer(http.Dir(staticDir))))
 
 	port := os.Getenv(constants.Port)
 	if port == "" {

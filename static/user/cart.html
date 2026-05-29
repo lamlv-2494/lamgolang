@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Cart - FoodDelivery</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { font-family: 'Poppins', sans-serif; }
+        body { background: #fafafa; min-height: 100vh; }
+
+        /* Navbar */
+        .navbar { background: linear-gradient(135deg, #c0392b, #e74c3c) !important; box-shadow: 0 2px 20px rgba(0,0,0,.2); }
+        .navbar-brand { font-weight: 800; color: #fff !important; font-size: 1.3rem; }
+        .navbar-brand span { color: #ffd166; }
+        .nav-link { color: rgba(255,255,255,.85) !important; font-weight: 500; }
+        .nav-link:hover { color: #ffd166 !important; }
+
+        /* Page header */
+        .page-header {
+            background: linear-gradient(135deg, #c0392b, #e74c3c, #e67e22);
+            padding: 40px 0 60px; color: #fff;
+        }
+        .page-header h1 { font-weight: 800; font-size: 2rem; }
+        .breadcrumb-item a { color: rgba(255,255,255,.7); text-decoration: none; }
+        .breadcrumb-item.active { color: #ffd166; }
+        .breadcrumb-item + .breadcrumb-item::before { color: rgba(255,255,255,.5); }
+
+        /* Cart section */
+        .cart-section { margin-top: -30px; }
+
+        /* Cart item card */
+        .cart-item-card {
+            background: #fff; border-radius: 16px; padding: 16px 20px; margin-bottom: 12px;
+            box-shadow: 0 4px 16px rgba(0,0,0,.06); transition: all .3s;
+            border: 1px solid transparent; width: 100%; display: flex; align-items: center; gap: 16px;
+        }
+        .cart-item-card:hover { border-color: #ffd4d0; box-shadow: 0 8px 24px rgba(0,0,0,.1); }
+        .cart-item-img { width: 80px; height: 80px; object-fit: cover; border-radius: 12px; flex-shrink: 0; }
+        .item-info { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+        .item-name { font-weight: 700; color: #2d3436; font-size: 1rem; }
+        .item-price { color: #636e72; font-size: .9rem; }
+        .item-subtotal { font-weight: 700; color: #e74c3c; font-size: 1.1rem; }
+
+        /* Qty control */
+        .qty-control { display: flex; align-items: center; gap: 8px; }
+        .qty-btn {
+            width: 32px; height: 32px; border-radius: 50%;
+            border: 2px solid #e74c3c; background: #fff; color: #e74c3c;
+            font-size: 1rem; font-weight: 700; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; transition: all .2s;
+        }
+        .qty-btn:hover { background: #e74c3c; color: #fff; }
+        .qty-val { font-weight: 700; font-size: 1rem; min-width: 28px; text-align: center; color: #2d3436; }
+
+        .btn-remove { background: none; border: none; color: #b2bec3; font-size: 1rem; cursor: pointer; transition: color .2s; padding: 4px 8px; }
+        .btn-remove:hover { color: #e74c3c; }
+
+        /* Order summary */
+        .summary-card { background: #fff; border-radius: 20px; padding: 28px; box-shadow: 0 4px 20px rgba(0,0,0,.08); position: sticky; top: 24px; }
+        .summary-card h5 { font-weight: 700; color: #2d3436; margin-bottom: 20px; }
+        .summary-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-size: .95rem; color: #636e72; }
+        .summary-total { font-weight: 800; font-size: 1.3rem; color: #e74c3c; }
+        .divider-row { border: none; border-top: 2px dashed #f0f0f0; margin: 16px 0; }
+
+        .btn-checkout {
+            background: linear-gradient(135deg, #e74c3c, #c0392b); border: none;
+            border-radius: 14px; padding: 16px; font-size: 1rem; font-weight: 700;
+            color: #fff; width: 100%; transition: all .3s;
+        }
+        .btn-checkout:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(231,76,60,.4); color: #fff; }
+        .btn-checkout:disabled { opacity: .7; transform: none; }
+        .btn-continue { display: block; text-align: center; color: #e74c3c; font-weight: 600; text-decoration: none; font-size: .9rem; margin-top: 12px; }
+        .btn-continue:hover { text-decoration: underline; color: #c0392b; }
+
+        /* Empty cart */
+        .empty-cart { text-align: center; padding: 80px 20px; background: #fff; border-radius: 20px; box-shadow: 0 4px 16px rgba(0,0,0,.06); width: 100%; margin: 0 auto; }
+        .empty-cart i { font-size: 5rem; color: #ffd4d0; margin-bottom: 20px; display: block; }
+        .empty-cart h4 { font-weight: 700; color: #636e72; }
+
+        /* Toast */
+        .toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 9999; }
+        .toast-success { background: linear-gradient(135deg, #00b894, #00cec9); color: #fff; border: none; border-radius: 12px; }
+        .toast-error   { background: linear-gradient(135deg, #e74c3c, #c0392b); color: #fff; border: none; border-radius: 12px; }
+
+        /* Confirm modal */
+        .modal-content { border-radius: 20px; border: none; }
+        .modal-header { border-bottom: 1px solid #f0f0f0; }
+        .btn-confirm-checkout { background: linear-gradient(135deg, #e74c3c, #c0392b); border: none; border-radius: 10px; color: #fff; font-weight: 700; padding: 10px 28px; }
+        .btn-confirm-checkout:hover { color: #fff; opacity: .9; }
+
+        /* Suggestion section */
+        .suggestion-card { background: linear-gradient(135deg, #fff8f5, #fff3ef); border: 1px solid #ffd4d0; border-radius: 16px; padding: 20px; margin-top: 16px; }
+        .suggestion-label { font-size: .85rem; font-weight: 600; color: #e74c3c; margin-bottom: 12px; }
+        .suggestion-input { border-radius: 10px; border: 2px solid #ffd4d0; font-size: .9rem; resize: none; }
+        .suggestion-input:focus { border-color: #e74c3c; box-shadow: 0 0 0 3px rgba(231,76,60,.1); outline: none; }
+        .btn-suggestion { background: #e74c3c; border: none; color: #fff; border-radius: 10px; font-size: .85rem; font-weight: 600; padding: 8px 20px; }
+        .btn-suggestion:hover { background: #c0392b; color: #fff; }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .navbar { padding: 12px 0; }
+            .navbar-brand { font-size: 1.1rem; }
+            .page-header { padding: 30px 0 40px; }
+            .page-header h1 { font-size: 1.5rem; }
+            .breadcrumb-item { font-size: 0.85rem; }
+            .cart-item-card { gap: 12px; padding: 12px 16px; }
+            .cart-item-img { width: 70px; height: 70px; }
+            .item-name { font-size: 0.9rem; }
+            .item-price { font-size: 0.85rem; }
+            .qty-btn { width: 28px; height: 28px; font-size: 0.9rem; }
+            .qty-val { font-size: 0.9rem; }
+            .item-subtotal { font-size: 1rem; }
+            .summary-card { position: relative; top: 0; margin-top: 24px; }
+            .summary-row { font-size: 0.9rem; }
+            .summary-total { font-size: 1.2rem; }
+            .btn-checkout { padding: 14px; font-size: 0.95rem; }
+        }
+
+        @media (max-width: 576px) {
+            .navbar-brand { font-size: 1rem; }
+            .nav-link { font-size: 0.85rem; }
+            .page-header { padding: 20px 0 30px; }
+            .page-header h1 { font-size: 1.2rem; gap: 8px; }
+            .breadcrumb { margin-bottom: 8px; }
+            .cart-item-card { flex-direction: column; gap: 8px; padding: 12px; }
+            .cart-item-img { width: 100%; max-width: 200px; height: 150px; }
+            .item-info { width: 100%; }
+            .qty-control { justify-content: space-between; }
+            .item-name { font-size: 0.85rem; }
+            .item-price { font-size: 0.8rem; }
+            .item-subtotal { font-size: 0.9rem; }
+            .btn-remove { font-size: 0.9rem; }
+            .summary-card { padding: 20px; margin-top: 16px; }
+            .summary-row { font-size: 0.85rem; }
+            .summary-total { font-size: 1.1rem; }
+            .btn-checkout { padding: 12px; font-size: 0.9rem; }
+            .btn-continue { font-size: 0.85rem; }
+            .empty-cart { padding: 60px 20px; }
+            .empty-cart i { font-size: 4rem; }
+            .empty-cart h4 { font-size: 1.2rem; }
+            .suggestion-card { padding: 16px; margin-top: 12px; }
+            .suggestion-label { font-size: 0.8rem; }
+            .suggestion-input { font-size: 0.85rem; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg">
+    <div class="container">
+        <a class="navbar-brand" href="/"><i class="fas fa-utensils me-2" style="color:#ffd166"></i>Food<span>Delivery</span></a>
+        <div class="ms-auto d-flex align-items-center gap-3">
+            <a href="/" class="nav-link"><i class="fas fa-home me-1"></i>Home</a>
+            <a href="/user/orders.html" class="nav-link"><i class="fas fa-receipt me-1"></i>Orders</a>
+            <a href="/user/profile.html" class="nav-link" id="userLabel"><i class="fas fa-user me-1"></i>Account</a>
+        </div>
+    </div>
+</nav>
+
+<!-- Page Header -->
+<div class="page-header">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-2">
+                <li class="breadcrumb-item"><a href="/">Home</a></li>
+                <li class="breadcrumb-item active">My Cart</li>
+            </ol>
+        </nav>
+        <h1><i class="fas fa-shopping-cart me-2"></i>My Cart</h1>
+    </div>
+</div>
+
+<div class="container cart-section pb-5">
+    <div id="cartContent" style="display:none"></div>
+    <div id="cartWrapper" class="row g-4">
+        <!-- Cart Items -->
+        <div class="col-lg-8">
+            <div id="cartItems">
+                <!-- Loading skeleton -->
+                <div id="cartSkeleton">
+                    <div style="background:linear-gradient(90deg,#f0f0f0 25%,#e0e0e0 50%,#f0f0f0 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:16px;height:112px;margin-bottom:12px"></div>
+                    <div style="background:linear-gradient(90deg,#f0f0f0 25%,#e0e0e0 50%,#f0f0f0 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:16px;height:112px;margin-bottom:12px"></div>
+                </div>
+            </div>
+
+            <!-- Suggestion -->
+            <div class="suggestion-card" id="suggestionBox" style="display:none">
+                <p class="suggestion-label"><i class="fas fa-lightbulb me-1"></i>Suggest a new dish for us?</p>
+                <textarea id="suggestionText" class="form-control suggestion-input" rows="2" placeholder="e.g. I'd love to see a special beef pho..."></textarea>
+                <button class="btn btn-suggestion mt-2" onclick="sendSuggestion()">
+                    <i class="fas fa-paper-plane me-1"></i>Send Suggestion
+                </button>
+            </div>
+        </div>
+
+        <!-- Order Summary -->
+        <div class="col-lg-4">
+            <div class="summary-card" id="summaryCard" style="display:none">
+                <h5><i class="fas fa-receipt me-2" style="color:#e74c3c"></i>Order Summary</h5>
+                <div class="summary-row">
+                    <span>Items</span>
+                    <span id="itemCount" class="fw-bold">0</span>
+                </div>
+                <div class="summary-row">
+                    <span>Subtotal</span>
+                    <span id="subtotalDisplay">$0.00</span>
+                </div>
+                <div class="summary-row">
+                    <span>Delivery Fee</span>
+                    <span class="text-success fw-600">Free</span>
+                </div>
+                <hr class="divider-row">
+                <div class="summary-row">
+                    <span class="fw-700 text-dark">Total</span>
+                    <span id="totalDisplay" class="summary-total">$0.00</span>
+                </div>
+                <button class="btn-checkout mt-4" onclick="confirmCheckout()" id="checkoutBtn">
+                    <i class="fas fa-check-circle me-2"></i>Place Order
+                </button>
+                <a href="/" class="btn-continue"><i class="fas fa-arrow-left me-1"></i>Continue Shopping</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Confirm Modal -->
+<div class="modal fade" id="confirmModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered" style="max-width:440px">
+        <div class="modal-content p-4">
+            <div class="text-center mb-3">
+                <div style="width:64px;height:64px;background:#fff3f0;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:1.8rem">🛵</div>
+                <h5 class="fw-bold">Confirm Order</h5>
+                <p class="text-muted small">You are about to place all items in your cart. This action cannot be undone.</p>
+                <p class="summary-total" id="confirmTotal" style="font-size:1.6rem"></p>
+            </div>
+            <div class="d-flex gap-2 justify-content-center">
+                <button class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
+                <button class="btn-confirm-checkout" onclick="doCheckout()">
+                    <i class="fas fa-check me-1"></i>Confirm
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toast -->
+<div class="toast-container">
+    <div id="appToast" class="toast align-items-center" role="alert">
+        <div class="d-flex">
+            <div class="toast-body fw-500" id="toastMsg"></div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    </div>
+</div>
+
+<style>
+    @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/js/api.js"></script>
+<script src="/js/auth.js"></script>
+<script>
+    // Auth guard
+    const user = getCurrentUser();
+    if (!user) window.location.href = '/user/login.html';
+
+    document.getElementById('userLabel').innerHTML = `<i class="fas fa-user me-1"></i>${user?.username || 'Account'}`;
+
+    let cartData = null;
+
+    function showToast(msg, type = 'success') {
+        const t = document.getElementById('appToast');
+        document.getElementById('toastMsg').textContent = msg;
+        t.className = `toast align-items-center ${type === 'error' ? 'toast-error' : 'toast-success'}`;
+        bootstrap.Toast.getOrCreateInstance(t, {delay: 2500}).show();
+    }
+
+    async function loadCart() {
+        try {
+            cartData = await fetchAPI('/cart');
+            renderCart(cartData);
+        } catch(e) {
+            const cartContent = document.getElementById('cartContent');
+            cartContent.innerHTML = `<div class="empty-cart"><i class="fas fa-exclamation-circle"></i><h4 style="color:#636e72">Failed to load cart</h4><p class="text-muted">${e.message}</p></div>`;
+            cartContent.style.display = 'block';
+            document.getElementById('cartWrapper').style.display = 'none';
+        }
+    }
+
+    function renderCart(data) {
+        const skeleton = document.getElementById('cartSkeleton');
+        if (skeleton) skeleton.remove();
+        const cartContent = document.getElementById('cartContent');
+        const cartItems   = document.getElementById('cartItems');
+        const summary  = document.getElementById('summaryCard');
+        const sugBox   = document.getElementById('suggestionBox');
+        const wrapper  = document.getElementById('cartWrapper');
+
+        if (!data.items || data.items.length === 0) {
+            wrapper.style.display = 'none';
+            cartContent.innerHTML = `
+                <div class="empty-cart">
+                    <i class="fas fa-shopping-cart"></i>
+                    <h4 style="color:#636e72">Your cart is empty</h4>
+                    <p class="text-muted mb-4">Add your favourite dishes to your cart!</p>
+                    <a href="/" class="btn" style="background:linear-gradient(135deg,#e74c3c,#c0392b);color:#fff;border-radius:30px;padding:12px 32px;font-weight:700">
+                        <i class="fas fa-utensils me-2"></i>Browse Menu
+                    </a>
+                </div>`;
+            cartContent.style.display = 'block';
+            summary.style.display = 'none';
+            return;
+        }
+
+        // Show grid when there are items
+        wrapper.style.display = '';
+        cartContent.style.display = 'none';
+        cartItems.innerHTML = '';
+
+        // Render items
+        let html = '';
+        data.items.forEach(item => {
+            const img = item.image || 'https://placehold.co/80?text=Food';
+            html += `
+                <div class="cart-item-card" id="item-${item.id}">
+                    <img src="${img}" class="cart-item-img" alt="${item.name}">
+                    <div class="item-info">
+                        <div class="item-name">${item.name}</div>
+                        <div class="item-price">Unit price: <strong>$${item.price.toFixed(2)}</strong></div>
+                    </div>
+                    <div class="qty-control">
+                        <button class="qty-btn" onclick="updateQty(${item.id}, ${item.quantity - 1})">−</button>
+                        <span class="qty-val">${item.quantity}</span>
+                        <button class="qty-btn" onclick="updateQty(${item.id}, ${item.quantity + 1})">+</button>
+                    </div>
+                    <div class="item-subtotal">$${item.sub_total.toFixed(2)}</div>
+                    <button class="btn-remove" onclick="removeItem(${item.id})" title="Remove">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </div>`;
+        });
+        cartItems.innerHTML = html;
+
+        // Update summary
+        document.getElementById('itemCount').textContent = data.items.length + (data.items.length !== 1 ? ' items' : ' item');
+        document.getElementById('subtotalDisplay').textContent = `$${data.total_amount.toFixed(2)}`;
+        document.getElementById('totalDisplay').textContent    = `$${data.total_amount.toFixed(2)}`;
+        summary.style.display = 'block';
+        sugBox.style.display = 'block';
+    }
+
+    async function updateQty(itemId, newQty) {
+        if (newQty < 1) return removeItem(itemId);
+        try {
+            await fetchAPI(`/cart/${itemId}`, 'PUT', {quantity: newQty});
+            loadCart();
+        } catch(e) { showToast(e.message || 'Failed to update', 'error'); }
+    }
+
+    async function removeItem(itemId) {
+        const card = document.getElementById(`item-${itemId}`);
+        if (card) card.style.opacity = '.4';
+        try {
+            await fetchAPI(`/cart/${itemId}`, 'DELETE');
+            showToast('Item removed from cart');
+            loadCart();
+        } catch(e) {
+            if (card) card.style.opacity = '1';
+            showToast(e.message || 'Failed to remove item', 'error');
+        }
+    }
+
+    function confirmCheckout() {
+        document.getElementById('confirmTotal').textContent = document.getElementById('totalDisplay').textContent;
+        bootstrap.Modal.getOrCreateInstance(document.getElementById('confirmModal')).show();
+    }
+
+    async function doCheckout() {
+        bootstrap.Modal.getInstance(document.getElementById('confirmModal')).hide();
+        const btn = document.getElementById('checkoutBtn');
+        btn.disabled = true; btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Placing order...';
+        try {
+            await fetchAPI('/orders', 'POST');
+            showToast('Order placed successfully! 🎉');
+            setTimeout(() => window.location.href = '/user/orders.html', 1500);
+        } catch(e) {
+            showToast(e.message || 'Failed to place order', 'error');
+            btn.disabled = false; btn.innerHTML = '<i class="fas fa-check-circle me-2"></i>Place Order';
+        }
+    }
+
+    async function sendSuggestion() {
+        const text = document.getElementById('suggestionText').value.trim();
+        if (!text) return showToast('Please enter your suggestion', 'error');
+        try {
+            await fetchAPI('/suggestions', 'POST', {content: text});
+            showToast('Thanks for your suggestion!');
+            document.getElementById('suggestionText').value = '';
+        } catch(e) { showToast(e.message || 'Failed to send suggestion', 'error'); }
+    }
+
+    loadCart();
+</script>
+</body>
+</html>

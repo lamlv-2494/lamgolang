@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Manage Orders</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { font-family: 'Poppins', sans-serif; }
+        body { background: #fafafa; min-height: 100vh; }
+        .navbar { background: linear-gradient(135deg, #c0392b, #e74c3c) !important; box-shadow: 0 2px 20px rgba(0,0,0,.2); }
+        .navbar-brand { font-weight: 800; color: #fff !important; font-size: 1.2rem; }
+        .navbar-brand i { color: #ffd166; }
+        .btn-logout { background: rgba(255,255,255,.2); border: 1px solid rgba(255,255,255,.4); color: #fff; font-weight: 600; transition: all .3s; }
+        .btn-logout:hover { background: rgba(255,255,255,.3); color: #ffd166; }
+        .admin-container { margin-top: 20px; margin-bottom: 40px; }
+        .admin-sidebar { margin-bottom: 24px; }
+        .admin-nav { background: #fff; border-radius: 16px; box-shadow: 0 4px 16px rgba(0,0,0,.06); overflow: hidden; }
+        .admin-nav a { display: flex; align-items: center; gap: 12px; padding: 14px 18px; border: none; color: #636e72; font-weight: 500; border-left: 4px solid transparent; transition: all .25s; font-size: .95rem; }
+        .admin-nav a:hover { background: #f9f9f9; color: #e74c3c; border-left-color: #e74c3c; }
+        .admin-nav a.active { background: linear-gradient(135deg, #fff8f5, #fff3ef); color: #e74c3c; border-left-color: #e74c3c; font-weight: 700; }
+        .admin-nav a i { width: 20px; text-align: center; }
+        .admin-card { background: #fff; border-radius: 20px; box-shadow: 0 4px 20px rgba(0,0,0,.08); overflow: hidden; }
+        .admin-card-header { background: linear-gradient(135deg, #fff8f5, #fff3ef); padding: 24px; border-bottom: 2px solid #f0f0f0; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+        .admin-card-header h5 { font-weight: 700; color: #2d3436; margin: 0; font-size: 1.1rem; }
+        .btn-add { background: linear-gradient(135deg, #e74c3c, #c0392b); border: none; border-radius: 10px; color: #fff; font-weight: 600; padding: 10px 20px; transition: all .3s; font-size: .9rem; }
+        .btn-add:hover { transform: translateY(-2px); box-shadow: 0 8px 16px rgba(231,76,60,.3); color: #fff; }
+        .btn-add i { margin-right: 6px; }
+        .admin-card-body { padding: 0; }
+        .table-wrapper { overflow-x: auto; }
+        .admin-table { margin: 0; }
+        .admin-table thead th { background: #f9f9f9; font-weight: 700; color: #636e72; border-bottom: 2px solid #f0f0f0; padding: 16px; font-size: .9rem; }
+        .admin-table tbody td { padding: 14px 16px; border-bottom: 1px solid #f0f0f0; color: #636e72; }
+        .admin-table tbody tr:hover { background: #f9f9f9; }
+        .badge-status { border-radius: 8px; padding: 4px 10px; font-size: .8rem; font-weight: 600; }
+        .badge-pending { background: #fff3f0; color: #e74c3c; border: 1px solid #ffd4d0; }
+        .badge-completed { background: #f0fff4; color: #00b894; border: 1px solid #c3e6cb; }
+        .badge-cancelled { background: #f5f5f5; color: #636e72; border: 1px solid #ddd; }
+        .btn-view { background: none; border: 1px solid #e74c3c; color: #e74c3c; border-radius: 8px; padding: 6px 14px; font-size: .85rem; font-weight: 600; transition: all .2s; }
+        .btn-view:hover { background: #e74c3c; color: #fff; }
+        .pagination-wrapper { padding: 20px 24px; background: #f9f9f9; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+        .pagination-info { color: #636e72; font-size: .9rem; }
+        @media (max-width: 768px) {
+            .navbar { padding: 12px 0; }
+            .navbar-brand { font-size: 1rem; }
+            .admin-container { margin-top: 12px; }
+            .admin-nav a { padding: 12px 14px; font-size: .9rem; }
+            .admin-card-header { padding: 16px; gap: 8px; }
+            .admin-card-header h5 { font-size: 1rem; }
+            .btn-add { font-size: .85rem; padding: 8px 16px; }
+            .admin-table thead th, .admin-table tbody td { padding: 12px; font-size: .85rem; }
+            .pagination-wrapper { padding: 16px; flex-direction: column; }
+            .pagination-info { font-size: .8rem; }
+        }
+        @media (max-width: 576px) {
+            .navbar-brand { font-size: .9rem; }
+            .admin-card-header { padding: 12px; }
+            .admin-card-header h5 { font-size: .9rem; }
+            .btn-add { font-size: .8rem; padding: 6px 12px; }
+            .admin-table thead { display: none; }
+            .admin-table tbody, .admin-table tr, .admin-table td { display: block; width: 100%; }
+            .admin-table tr { margin-bottom: 16px; border: 1px solid #f0f0f0; border-radius: 10px; overflow: hidden; }
+            .admin-table td { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; border-bottom: 1px solid #f0f0f0; }
+            .admin-table td:first-child { font-weight: 700; color: #2d3436; }
+            .pagination-wrapper { padding: 12px; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid">
+            <span class="navbar-brand"><i class="fas fa-utensils me-2"></i>Admin Panel</span>
+            <button class="btn btn-logout btn-sm ms-auto" onclick="adminLogout()"><i class="fas fa-sign-out-alt me-1"></i>Logout</button>
+        </div>
+    </nav>
+
+    <div class="container admin-container">
+        <div class="row">
+            <div class="col-md-3 admin-sidebar">
+                <div class="admin-nav">
+                    <a href="categories.html"><i class="fas fa-list"></i>Manage Categories</a>
+                    <a href="products.html"><i class="fas fa-box"></i>Manage Products</a>
+                    <a href="orders.html" class="active"><i class="fas fa-receipt"></i>Manage Orders</a>
+                    <a href="users.html"><i class="fas fa-users"></i>Manage Users</a>
+                    <a href="suggestions.html"><i class="fas fa-lightbulb"></i>Suggestions</a>
+                </div>
+            </div>
+
+            <div class="col-md-9">
+                <div class="admin-card">
+                    <div class="admin-card-header">
+                        <h5>Customer Invoices & Orders</h5>
+                    </div>
+                    <div class="admin-card-body">
+                        <div class="table-wrapper">
+                            <table class="table admin-table table-hover align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>Order ID</th>
+                                        <th>Date</th>
+                                        <th>Purchased Items</th>
+                                        <th>Total Price</th>
+                                        <th>Order Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="orderTableBody">
+                                    </tbody>
+                            </table>
+                        </div>
+
+                        <div class="pagination-wrapper">
+                            <span class="pagination-info" id="paginationInfo">Showing 0 of 0 items</span>
+                            <ul class="pagination pagination-sm mb-0" id="paginationControls">
+                                </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/api.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Enforce strict token scope role check before loading view context
+        requireAdmin();
+
+        let currentPage = 1;
+        const pageLimit = 5;
+
+        // Initialize lists on page readiness state
+        window.addEventListener('DOMContentLoaded', () => loadOrders(currentPage));
+
+        // Pull paginated order invoice collections from Backend server
+        async function loadOrders(page) {
+            currentPage = page;
+            try {
+                // Execute administrative protected endpoint passing page tokens
+                const response = await fetchAPI(`/admin/orders?page=${page}&limit=${pageLimit}`, 'GET');
+                
+                // Read exact layout nodes matching your ListResponse Generic format
+                const orders = response.items || [];
+                const totalCount = response.totalCount || 0;
+
+                renderTable(orders);
+                renderPagination(totalCount);
+            } catch (error) {
+                alert('Failed to fetch invoice history: ' + error.message);
+            }
+        }
+
+        // Render dataset onto DOM table rows with sub-item item listings
+        function renderTable(orders) {
+            const tbody = document.getElementById('orderTableBody');
+            tbody.innerHTML = '';
+
+            if (orders.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center text-muted py-4"><i class="fas fa-inbox me-2"></i>No consumer orders recorded yet.</td></tr>`;
+                return;
+            }
+
+            orders.forEach(order => {
+                // Construct a neat text summary block for item list inside this invoice
+                let itemsSummary = '<ul class="list-unstyled mb-0 small text-secondary">';
+                order.items.forEach(it => {
+                    itemsSummary += `<li>• ${it.name} <span class="fw-bold">x${it.quantity}</span> ($${it.price.toFixed(2)})</li>`;
+                });
+                itemsSummary += '</ul>';
+
+                // Get status badge class based on order status
+                let statusBadgeClass = 'badge-pending';
+                let statusLabel = '⏳ Pending';
+                if (order.status === 'completed') {
+                    statusBadgeClass = 'badge-completed';
+                    statusLabel = '✅ Completed';
+                } else if (order.status === 'cancelled') {
+                    statusBadgeClass = 'badge-cancelled';
+                    statusLabel = '❌ Cancelled';
+                } else if (order.status === 'delivering') {
+                    statusBadgeClass = 'badge-pending';
+                    statusLabel = '🛵 Delivering';
+                } else if (order.status === 'processing') {
+                    statusBadgeClass = 'badge-pending';
+                    statusLabel = '🍳 Processing';
+                }
+
+                // Setup the reactive select status dropdown with default value matching active record row state
+                const row = `
+                    <tr>
+                        <td><strong>#INV-${order.id}</strong></td>
+                        <td class="small text-muted">${new Date(order.created_at).toLocaleString()}</td>
+                        <td>${itemsSummary}</td>
+                        <td><span class="price-text">$${order.total_price.toFixed(2)}</span></td>
+                        <td>
+                            <select class="form-select form-select-sm fw-semibold status-select\" 
+                                    style="width: 140px;" 
+                                    onchange="updateStatus(${order.id}, this.value)">
+                                <option value="pending" ${order.status === 'pending' ? 'selected' : ''}>⏳ Pending</option>
+                                <option value="processing" ${order.status === 'processing' ? 'selected' : ''}>🍳 Processing</option>
+                                <option value="delivering" ${order.status === 'delivering' ? 'selected' : ''}>🛵 Delivering</option>
+                                <option value="completed" ${order.status === 'completed' ? 'selected' : ''}>✅ Completed</option>
+                                <option value="cancelled" ${order.status === 'cancelled' ? 'selected' : ''}>❌ Cancelled</option>
+                            </select>
+                        </td>
+                    </tr>
+                `;
+                tbody.insertAdjacentHTML('beforeend', row);
+            });
+        }
+
+        // Generate pagination button navigations mapping record totals
+        function renderPagination(totalCount) {
+            const info = document.getElementById('paginationInfo');
+            const controls = document.getElementById('paginationControls');
+            controls.innerHTML = '';
+
+            const totalPages = Math.ceil(totalCount / pageLimit);
+            info.textContent = `Showing page ${currentPage} of ${totalPages || 1} (Total: ${totalCount} invoices)`;
+
+            if (totalPages <= 1) return;
+
+            for (let i = 1; i <= totalPages; i++) {
+                const activeClass = i === currentPage ? 'active' : '';
+                const li = `
+                    <li class="page-item ${activeClass}">
+                        <button class="page-link" onclick="loadOrders(${i})">${i}</button>
+                    </li>
+                `;
+                controls.insertAdjacentHTML('beforeend', li);
+            }
+        }
+
+        // Trigger real-time status update stream request to backend servers
+        async function updateStatus(orderId, newStatus) {
+            try {
+                // Post payload validation exactly bound to requests.UpdateOrderStatusRequest structure
+                await fetchAPI(`/admin/orders/${orderId}/status`, 'PUT', { status: newStatus });
+                
+                // Show a quick browser confirmation and refresh state stack layout smoothly
+                alert(`Order #INV-${orderId} status successfully moved to: ${newStatus.toUpperCase()}`);
+                loadOrders(currentPage);
+            } catch (error) {
+                alert('Status modifier execution rejected: ' + error.message);
+                loadOrders(currentPage); // Revert UI dropdown selection change state on error hook response
+            }
+        }
+    </script>
+</body>
+</html>
