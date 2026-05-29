@@ -47,3 +47,10 @@ func RegisterRatingRoutes(api *gin.RouterGroup, ratingHandler *handlers.RatingHa
 		ratingGroup.GET("/ratings", ratingHandler.GetRatingsByUserID)
 	}
 }
+
+func RegisterSuggestionRoutes(api *gin.RouterGroup, suggestionHandler *handlers.SuggestionHandler) {
+	suggestionGroup := api.Group("/suggestions", middlewares.AuthMiddleware())
+	{
+		suggestionGroup.POST("", suggestionHandler.CreateSuggestion)
+	}
+}
