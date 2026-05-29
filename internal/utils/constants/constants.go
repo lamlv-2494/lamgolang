@@ -18,6 +18,7 @@ const (
 	MinPriceParam   = "min_price"
 	MaxPriceParam   = "max_price"
 	RatingParam     = "rating"
+	SearchParam     = "search"
 	SortParam       = "sort"
 
 	PageParam  = "page"

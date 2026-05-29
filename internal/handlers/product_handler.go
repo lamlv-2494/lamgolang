@@ -126,6 +126,7 @@ func (h *ProductHandler) DeleteProduct(ctx *gin.Context) {
 
 func (h *ProductHandler) GetProducts(ctx *gin.Context) {
 	classify := ctx.Query(constants.ClassifyParam)
+	search := ctx.Query(constants.SearchParam)
 	sort := ctx.Query(constants.SortParam)
 
 	var categoryID uint
@@ -158,7 +159,7 @@ func (h *ProductHandler) GetProducts(ctx *gin.Context) {
 
 	page, limit := GetPaginationParams(ctx)
 
-	products, err := h.service.GetProducts(classify, categoryID, minPrice, maxPrice, minRating, sort, page, limit)
+	products, err := h.service.GetProducts(search, classify, categoryID, minPrice, maxPrice, minRating, sort, page, limit)
 	if err != nil {
 		ResponseError(ctx, err)
 		return

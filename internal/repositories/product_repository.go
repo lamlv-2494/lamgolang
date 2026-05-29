@@ -12,7 +12,7 @@ type ProductRepository interface {
 	FindByID(id uint) (*entities.Product, error)
 	Update(product *entities.Product) error
 	Delete(product *entities.Product) error
-	List(classify string, categoryID uint, minPrice, maxPrice float64, minRating float64, sort string, page, limit int) ([]*entities.Product, int64, error)
+	List(search, classify string, categoryID uint, minPrice, maxPrice float64, minRating float64, sort string, page, limit int) ([]*entities.Product, int64, error)
 }
 
 type productRepository struct {
@@ -43,11 +43,15 @@ func (r *productRepository) Delete(product *entities.Product) error {
 	return r.db.Delete(product).Error
 }
 
-func (r *productRepository) List(classify string, categoryID uint, minPrice, maxPrice float64, minRating float64, sort string, page, limit int) ([]*entities.Product, int64, error) {
+func (r *productRepository) List(search, classify string, categoryID uint, minPrice, maxPrice float64, minRating float64, sort string, page, limit int) ([]*entities.Product, int64, error) {
 	var products []*entities.Product
 	var totalCount int64
 
 	query := r.db.Preload("Category").Preload("Ratings").Model(&entities.Product{})
+
+	if search != "" {
+		query = query.Where("LOWER(name) LIKE ?", "%"+strings.ToLower(search)+"%")
+	}
 
 	if classify != "" {
 		query = query.Where("category_id IN (SELECT id FROM categories WHERE LOWER(name) LIKE ?)", "%"+strings.ToLower(classify)+"%")
