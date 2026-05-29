@@ -17,7 +17,7 @@ type UserService interface {
 	UpdateUser(id uint, req *requests.UpdateUserRequest) (*responses.UserResponse, error)
 
 	// Admin functions
-	GetAllUsers(page, limit int) (*responses.AnyListResponse, error)
+	GetAllUsers(page, limit int) (*responses.ListResponse[*responses.UserData], error)
 	AdminUpdateUser(targetID uint, req *requests.AdminUpdateUserRequest) (*responses.UserResponse, error)
 	AdminDeleteUser(targetID uint) error
 }
@@ -164,23 +164,23 @@ func (u *userService) UpdateUser(id uint, req *requests.UpdateUserRequest) (*res
 }
 
 // Admin functions
-func (u *userService) GetAllUsers(page, limit int) (*responses.AnyListResponse, error) {
+func (u *userService) GetAllUsers(page, limit int) (*responses.ListResponse[*responses.UserData], error) {
 	users, totalCount, err := u.repo.FindAllUsers(page, limit)
 	if err != nil {
 		return nil, configs.FetchUsersFailed
 	}
 
-	var userResponses []responses.UserData
+	var userResponses []*responses.UserData
 	for _, user := range users {
-		userResponses = append(userResponses, responses.UserData{
+		userResponses = append(userResponses, &responses.UserData{
 			ID:       user.ID,
 			Email:    user.Email,
 			Username: user.Username,
 			Role:     user.Role,
 		})
 	}
-	return &responses.AnyListResponse{
-		Data:       userResponses,
+	return &responses.ListResponse[*responses.UserData]{
+		Items:      userResponses,
 		TotalCount: totalCount,
 	}, nil
 }

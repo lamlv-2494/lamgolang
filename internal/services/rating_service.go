@@ -12,7 +12,7 @@ type RatingService interface {
 	CreateRating(userID, productID uint, req requests.CreateRatingRequest) error
 	GetRatingByID(userID uint, productID uint) (*responses.RatingResponse, error)
 
-	GetRatingsByUserID(userID uint, page, limit int) (*responses.AnyListResponse, error)
+	GetRatingsByUserID(userID uint, page, limit int) (*responses.ListResponse[*responses.RatingResponseData], error)
 }
 
 type ratingService struct {
@@ -66,7 +66,7 @@ func (s *ratingService) GetRatingByID(userID uint, productID uint) (*responses.R
 	}, nil
 }
 
-func (s *ratingService) GetRatingsByUserID(userID uint, page, limit int) (*responses.AnyListResponse, error) {
+func (s *ratingService) GetRatingsByUserID(userID uint, page, limit int) (*responses.ListResponse[*responses.RatingResponseData], error) {
 
 	ratings, totalCount, err := s.ratingRepo.GetRatingsByUserID(userID, page, limit)
 	if err != nil {
@@ -74,23 +74,23 @@ func (s *ratingService) GetRatingsByUserID(userID uint, page, limit int) (*respo
 	}
 
 	if ratings == nil {
-		return &responses.AnyListResponse{
-			Data:       []responses.RatingResponseData{},
+		return &responses.ListResponse[*responses.RatingResponseData]{
+			Items:      []*responses.RatingResponseData{},
 			TotalCount: totalCount,
 		}, nil
 	}
 
-	var ratingResponses []responses.RatingResponseData
+	var ratingResponses []*responses.RatingResponseData
 	for _, rating := range ratings {
-		ratingResponses = append(ratingResponses, responses.RatingResponseData{
+		ratingResponses = append(ratingResponses, &responses.RatingResponseData{
 			ProductID: rating.ProductID,
 			Stars:     rating.Stars,
 			Comment:   rating.Comment,
 		})
 	}
 
-	return &responses.AnyListResponse{
-		Data:       ratingResponses,
+	return &responses.ListResponse[*responses.RatingResponseData]{
+		Items:      ratingResponses,
 		TotalCount: totalCount,
 	}, nil
 }

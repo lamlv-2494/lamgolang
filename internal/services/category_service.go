@@ -12,7 +12,7 @@ type CategoryService interface {
 	CreateCategory(req requests.CreateCategoryRequest) (*entities.Category, error)
 	UpdateCategory(id uint, req requests.UpdateCategoryRequest) (*entities.Category, error)
 	DeleteCategory(id uint) error
-	GetCategories(page, limit int) (responses.AnyListResponse, error)
+	GetCategories(page, limit int) (responses.ListResponse[*entities.Category], error)
 }
 
 type categoryService struct {
@@ -69,14 +69,14 @@ func (s *categoryService) DeleteCategory(id uint) error {
 	return s.repo.Delete(category)
 }
 
-func (s *categoryService) GetCategories(page, limit int) (responses.AnyListResponse, error) {
+func (s *categoryService) GetCategories(page, limit int) (responses.ListResponse[*entities.Category], error) {
 	categories, totalCount, err := s.repo.List(page, limit)
 	if err != nil {
-		return responses.AnyListResponse{}, err
+		return responses.ListResponse[*entities.Category]{}, err
 	}
 
-	return responses.AnyListResponse{
-		Data:       categories,
+	return responses.ListResponse[*entities.Category]{
+		Items:      categories,
 		TotalCount: totalCount,
 	}, nil
 }
