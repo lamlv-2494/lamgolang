@@ -91,7 +91,9 @@ func (uc *UserHandler) UpdateUser(ctx *gin.Context) {
 }
 
 func (uc *UserHandler) GetAllUsers(ctx *gin.Context) {
-	users, err := uc.userService.GetAllUsers()
+	page, limit := GetPaginationParams(ctx)
+
+	users, err := uc.userService.GetAllUsers(page, limit)
 	if err != nil {
 		ResponseError(ctx, err)
 		return

@@ -34,7 +34,10 @@ func (h *SuggestionHandler) CreateSuggestion(ctx *gin.Context) {
 }
 
 func (h *SuggestionHandler) GetAllSuggestions(ctx *gin.Context) {
-	suggestions, err := h.service.GetAllSuggestions()
+
+	page, limit := GetPaginationParams(ctx)
+
+	suggestions, err := h.service.GetAllSuggestions(page, limit)
 	if err != nil {
 		ResponseError(ctx, err)
 		return

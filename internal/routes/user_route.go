@@ -43,7 +43,7 @@ func RegisterRatingRoutes(api *gin.RouterGroup, ratingHandler *handlers.RatingHa
 	ratingGroup := api.Group("/products", middlewares.AuthMiddleware())
 	{
 		ratingGroup.POST("/:id/rating", ratingHandler.CreateRating)
-		ratingGroup.GET("/:id/rating", ratingHandler.GetRatingsByID)
+		ratingGroup.GET("/:id/rating", ratingHandler.GetRatingByID)
 		ratingGroup.GET("/ratings", ratingHandler.GetRatingsByUserID)
 	}
 }

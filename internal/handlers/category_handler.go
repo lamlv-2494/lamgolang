@@ -70,11 +70,13 @@ func (h *CategoryHandler) DeleteCategory(ctx *gin.Context) {
 }
 
 func (h *CategoryHandler) GetCategories(ctx *gin.Context) {
-	categories, err := h.service.GetCategories()
+	page, limit := GetPaginationParams(ctx)
+	categories, err := h.service.GetCategories(page, limit)
 	if err != nil {
 		ResponseError(ctx, err)
 		return
 	}
 
+	// TODO: create response model later
 	ResponseSuccess(ctx, http.StatusOK, categories)
 }

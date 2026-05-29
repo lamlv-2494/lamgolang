@@ -10,7 +10,7 @@ import (
 
 type SuggestionService interface {
 	CreateSuggestion(userID uint, req requests.CreateSuggestionRequest) error
-	GetAllSuggestions() (*responses.SuggestionListResponse, error)
+	GetAllSuggestions(page, limit int) (*responses.AnyListResponse, error)
 }
 
 type suggestionService struct {
@@ -34,8 +34,8 @@ func (s *suggestionService) CreateSuggestion(userID uint, req requests.CreateSug
 	return nil
 }
 
-func (s *suggestionService) GetAllSuggestions() (*responses.SuggestionListResponse, error) {
-	suggestions, err := s.suggestionRepo.ListAll()
+func (s *suggestionService) GetAllSuggestions(page, limit int) (*responses.AnyListResponse, error) {
+	suggestions, totalCount, err := s.suggestionRepo.ListAll(page, limit)
 	if err != nil {
 		return nil, configs.FetchSuggestionsFailed
 	}
@@ -53,5 +53,8 @@ func (s *suggestionService) GetAllSuggestions() (*responses.SuggestionListRespon
 		})
 	}
 
-	return &responses.SuggestionListResponse{Suggestions: suggestionResponses}, nil
+	return &responses.AnyListResponse{
+		Data:       suggestionResponses,
+		TotalCount: totalCount,
+	}, nil
 }

@@ -10,9 +10,9 @@ import (
 
 type RatingService interface {
 	CreateRating(userID, productID uint, req requests.CreateRatingRequest) error
-	GetRatingsByID(userID uint, productID uint) (*responses.RatingResponse, error)
+	GetRatingByID(userID uint, productID uint) (*responses.RatingResponse, error)
 
-	GetRatingsByUserID(userID uint) (*responses.RatingListResponse, error)
+	GetRatingsByUserID(userID uint, page, limit int) (*responses.AnyListResponse, error)
 }
 
 type ratingService struct {
@@ -47,7 +47,7 @@ func (s *ratingService) CreateRating(userID, productID uint, req requests.Create
 	return nil
 }
 
-func (s *ratingService) GetRatingsByID(userID uint, productID uint) (*responses.RatingResponse, error) {
+func (s *ratingService) GetRatingByID(userID uint, productID uint) (*responses.RatingResponse, error) {
 	rating, err := s.ratingRepo.FindByUserAndProduct(userID, productID)
 	if err != nil {
 		return nil, configs.RatingNotFound
@@ -66,15 +66,17 @@ func (s *ratingService) GetRatingsByID(userID uint, productID uint) (*responses.
 	}, nil
 }
 
-func (s *ratingService) GetRatingsByUserID(userID uint) (*responses.RatingListResponse, error) {
-	ratings, err := s.ratingRepo.GetRatingsByUserID(userID)
+func (s *ratingService) GetRatingsByUserID(userID uint, page, limit int) (*responses.AnyListResponse, error) {
+
+	ratings, totalCount, err := s.ratingRepo.GetRatingsByUserID(userID, page, limit)
 	if err != nil {
 		return nil, configs.RatingNotFound
 	}
 
 	if ratings == nil {
-		return &responses.RatingListResponse{
-			Ratings: []responses.RatingResponseData{},
+		return &responses.AnyListResponse{
+			Data:       []responses.RatingResponseData{},
+			TotalCount: totalCount,
 		}, nil
 	}
 
@@ -87,7 +89,8 @@ func (s *ratingService) GetRatingsByUserID(userID uint) (*responses.RatingListRe
 		})
 	}
 
-	return &responses.RatingListResponse{
-		Ratings: ratingResponses,
+	return &responses.AnyListResponse{
+		Data:       ratingResponses,
+		TotalCount: totalCount,
 	}, nil
 }

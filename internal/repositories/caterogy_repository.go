@@ -12,7 +12,7 @@ type CategoryRepository interface {
 	FindByName(name string) (*entities.Category, error)
 	Update(category *entities.Category) error
 	Delete(category *entities.Category) error
-	List() ([]*entities.Category, error)
+	List(page, limit int) ([]*entities.Category, int64, error)
 }
 
 type categoryRepository struct {
@@ -51,10 +51,16 @@ func (r *categoryRepository) Delete(category *entities.Category) error {
 	return r.db.Delete(category).Error
 }
 
-func (r *categoryRepository) List() ([]*entities.Category, error) {
+func (r *categoryRepository) List(page, limit int) ([]*entities.Category, int64, error) {
 	var categories []*entities.Category
-	if err := r.db.Find(&categories).Error; err != nil {
-		return nil, err
+	var totalCount int64
+	if err := r.db.Model(&entities.Category{}).Count(&totalCount).Error; err != nil {
+		return nil, 0, err
 	}
-	return categories, nil
+
+	offset := (page - 1) * limit
+	if err := r.db.Offset(offset).Limit(limit).Find(&categories).Error; err != nil {
+		return nil, 0, err
+	}
+	return categories, totalCount, nil
 }

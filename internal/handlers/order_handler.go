@@ -32,7 +32,9 @@ func (h *OrderHandler) Checkout(ctx *gin.Context) {
 func (h *OrderHandler) GetOrderHistory(ctx *gin.Context) {
 	userID := ctx.MustGet(constants.UserID).(uint)
 
-	orderHistory, err := h.service.GetOrderHistory(userID)
+	page, limit := GetPaginationParams(ctx)
+
+	orderHistory, err := h.service.GetOrderHistory(userID, page, limit)
 	if err != nil {
 		ResponseError(ctx, err)
 		return
@@ -42,7 +44,9 @@ func (h *OrderHandler) GetOrderHistory(ctx *gin.Context) {
 }
 
 func (h *OrderHandler) AdminGetAllOrders(ctx *gin.Context) {
-	orders, err := h.service.AdminGetAllOrders()
+	page, limit := GetPaginationParams(ctx)
+
+	orders, err := h.service.AdminGetAllOrders(page, limit)
 	if err != nil {
 		ResponseError(ctx, err)
 		return

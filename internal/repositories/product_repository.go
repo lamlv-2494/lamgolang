@@ -12,7 +12,7 @@ type ProductRepository interface {
 	FindByID(id uint) (*entities.Product, error)
 	Update(product *entities.Product) error
 	Delete(product *entities.Product) error
-	List(classify string, categoryID uint, minPrice, maxPrice float64, minRating float64, sort string) ([]*entities.Product, error)
+	List(classify string, categoryID uint, minPrice, maxPrice float64, minRating float64, sort string, page, limit int) ([]*entities.Product, int64, error)
 }
 
 type productRepository struct {
@@ -43,8 +43,9 @@ func (r *productRepository) Delete(product *entities.Product) error {
 	return r.db.Delete(product).Error
 }
 
-func (r *productRepository) List(classify string, categoryID uint, minPrice, maxPrice float64, minRating float64, sort string) ([]*entities.Product, error) {
+func (r *productRepository) List(classify string, categoryID uint, minPrice, maxPrice float64, minRating float64, sort string, page, limit int) ([]*entities.Product, int64, error) {
 	var products []*entities.Product
+	var totalCount int64
 
 	query := r.db.Preload("Category").Preload("Ratings").Model(&entities.Product{})
 
@@ -81,9 +82,14 @@ func (r *productRepository) List(classify string, categoryID uint, minPrice, max
 		query = query.Order("id DESC") // Default sort
 	}
 
-	if err := query.Find(&products).Error; err != nil {
-		return nil, err
+	offset := (page - 1) * limit
+	if err := query.Count(&totalCount).Error; err != nil {
+		return nil, 0, err
 	}
 
-	return products, nil
+	if err := query.Offset(offset).Limit(limit).Find(&products).Error; err != nil {
+		return nil, 0, err
+	}
+
+	return products, totalCount, nil
 }

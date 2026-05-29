@@ -8,12 +8,12 @@ import (
 
 type OrderRepository interface {
 	CreateOrderWithTransaction(order *entities.Order) error
-	ListByUserID(userID uint) ([]*entities.Order, error)
+	ListByUserID(userID uint, page, limit int) ([]*entities.Order, int64, error)
 
 	// Admin only
 	FindByOrderID(id uint) (*entities.Order, error)
 	Update(order *entities.Order) error
-	ListAll() ([]*entities.Order, error)
+	ListAll(page, limit int) ([]*entities.Order, int64, error)
 }
 
 type orderRepository struct {
@@ -38,19 +38,26 @@ func (r *orderRepository) CreateOrderWithTransaction(order *entities.Order) erro
 	})
 }
 
-func (r *orderRepository) ListByUserID(userID uint) ([]*entities.Order, error) {
+func (r *orderRepository) ListByUserID(userID uint, page, limit int) ([]*entities.Order, int64, error) {
 	var orders []*entities.Order
+	var totalCount int64
+	if err := r.db.Model(&entities.Order{}).Where("user_id = ?", userID).Count(&totalCount).Error; err != nil {
+		return nil, 0, err
+	}
+
 	if err := r.db.
 		Preload("OrderItems").
 		Preload("OrderItems.Product").
 		Where("user_id = ?", userID).
 		Order("created_at DESC").
+		Limit(limit).
+		Offset((page - 1) * limit).
 		Find(&orders).
 		Error; err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
-	return orders, nil
+	return orders, totalCount, nil
 }
 
 func (r *orderRepository) FindByOrderID(id uint) (*entities.Order, error) {
@@ -66,15 +73,22 @@ func (r *orderRepository) Update(order *entities.Order) error {
 	return r.db.Save(order).Error
 }
 
-func (r *orderRepository) ListAll() ([]*entities.Order, error) {
+func (r *orderRepository) ListAll(page, limit int) ([]*entities.Order, int64, error) {
 	var orders []*entities.Order
+	var totalCount int64
+	if err := r.db.Model(&entities.Order{}).Count(&totalCount).Error; err != nil {
+		return nil, 0, err
+	}
+
 	if err := r.db.
 		Preload("OrderItems").
 		Preload("OrderItems.Product").
 		Order("created_at DESC").
+		Limit(limit).
+		Offset((page - 1) * limit).
 		Find(&orders).
 		Error; err != nil {
-		return nil, err
+		return nil, 0, err
 	}
-	return orders, nil
+	return orders, totalCount, nil
 }
