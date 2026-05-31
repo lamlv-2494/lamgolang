@@ -32,9 +32,6 @@ func (r *ratingRepository) FindByUserAndProduct(userID, productID uint) (*entiti
 		First(&rating).
 		Error
 	if err != nil {
-		if err == gorm.ErrRecordNotFound {
-			return nil, nil
-		}
 		return nil, err
 	}
 	return &rating, nil
