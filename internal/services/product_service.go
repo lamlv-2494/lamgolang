@@ -57,8 +57,8 @@ func (s *productService) CreateProduct(req requests.CreateProductRequest) (*resp
 		Description: newProduct.Description,
 		Price:       newProduct.Price,
 		Image:       newProduct.Image,
-		CategoryID:  newProduct.CategoryID,
 		Category: responses.CategoryCompact{
+			ID:          newProduct.Category.ID,
 			Name:        newProduct.Category.Name,
 			Description: newProduct.Category.Description,
 		},
@@ -108,8 +108,8 @@ func (s *productService) UpdateProduct(id uint, req requests.UpdateProductReques
 		Description: newProduct.Description,
 		Price:       newProduct.Price,
 		Image:       newProduct.Image,
-		CategoryID:  newProduct.CategoryID,
 		Category: responses.CategoryCompact{
+			ID:          newProduct.Category.ID,
 			Name:        newProduct.Category.Name,
 			Description: newProduct.Category.Description,
 		},
@@ -161,8 +161,8 @@ func (s *productService) GetProducts(search, classify string, categoryID uint, m
 			Description: p.Description,
 			Price:       p.Price,
 			Image:       p.Image,
-			CategoryID:  p.CategoryID,
 			Category: responses.CategoryCompact{
+				ID:          p.Category.ID,
 				Name:        p.Category.Name,
 				Description: p.Category.Description,
 			},
@@ -197,8 +197,8 @@ func (s *productService) GetProductByID(id uint) (*responses.ProductData, error)
 		Description: product.Description,
 		Price:       product.Price,
 		Image:       product.Image,
-		CategoryID:  product.CategoryID,
 		Category: responses.CategoryCompact{
+			ID:          product.Category.ID,
 			Name:        product.Category.Name,
 			Description: product.Category.Description,
 		},

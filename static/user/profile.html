@@ -208,7 +208,7 @@
                     </a>
                 </div>
                 <div class="col-6">
-                    <a href="/" class="quick-link-card">
+                    <a href="#" class="quick-link-card" onclick="navigateToMenu(); return false;">
                         <div class="quick-link-icon" style="background:#fff8e1"><i class="fas fa-utensils" style="color:#e67e22"></i></div>
                         <div class="quick-link-label">Menu</div>
                     </a>
@@ -342,6 +342,10 @@
     }
 
     function getInitial(name) { return name ? name.charAt(0).toUpperCase() : '?'; }
+
+    function navigateToMenu() {
+        window.location.href = '/#catalog';
+    }
 
     async function loadUserInfo() {
         try {
