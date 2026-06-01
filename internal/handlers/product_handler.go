@@ -23,6 +23,23 @@ func NewProductHandler(service services.ProductService) *ProductHandler {
 	return &ProductHandler{service: service}
 }
 
+// CreateProduct godoc
+// @Summary Create product (Admin only)
+// @Description Create a new product (Admin only)
+// @Tags Admin - Products
+// @Accept multipart/form-data
+// @Produce json
+// @Security BearerAuth
+// @Param name formData string true "Product name"
+// @Param description formData string false "Product description"
+// @Param price formData number true "Product price"
+// @Param category_id formData int true "Category ID"
+// @Param image formData file true "Product image"
+// @Success 201 {object} map[string]interface{}
+// @Failure 400 "Invalid request"
+// @Failure 401 "Unauthorized"
+// @Failure 403 "Forbidden"
+// @Router /admin/products [post]
 func (h *ProductHandler) CreateProduct(ctx *gin.Context) {
 	var req requests.CreateProductRequest
 	if err := ctx.ShouldBind(&req); err != nil {
@@ -64,6 +81,24 @@ func (h *ProductHandler) CreateProduct(ctx *gin.Context) {
 	ResponseSuccess(ctx, http.StatusCreated, product)
 }
 
+// UpdateProduct godoc
+// @Summary Update product (Admin only)
+// @Description Update a product (Admin only)
+// @Tags Admin - Products
+// @Accept multipart/form-data
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "Product ID"
+// @Param name formData string false "Product name"
+// @Param description formData string false "Product description"
+// @Param price formData number false "Product price"
+// @Param category_id formData int false "Category ID"
+// @Param image formData file false "Product image"
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 "Invalid request"
+// @Failure 401 "Unauthorized"
+// @Failure 403 "Forbidden"
+// @Router /admin/products/{id} [put]
 func (h *ProductHandler) UpdateProduct(ctx *gin.Context) {
 	id, err := GetIDParam(ctx)
 	if err != nil {
@@ -109,6 +144,17 @@ func (h *ProductHandler) UpdateProduct(ctx *gin.Context) {
 	ResponseSuccess(ctx, http.StatusOK, product)
 }
 
+// DeleteProduct godoc
+// @Summary Delete product (Admin only)
+// @Description Delete a product (Admin only)
+// @Tags Admin - Products
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "Product ID"
+// @Success 200 "Product deleted"
+// @Failure 401 "Unauthorized"
+// @Failure 403 "Forbidden"
+// @Router /admin/products/{id} [delete]
 func (h *ProductHandler) DeleteProduct(ctx *gin.Context) {
 	id, err := GetIDParam(ctx)
 	if err != nil {
@@ -124,6 +170,21 @@ func (h *ProductHandler) DeleteProduct(ctx *gin.Context) {
 	ResponseSuccess(ctx, http.StatusOK, gin.H{"message": "Product deleted successfully"})
 }
 
+// GetProducts godoc
+// @Summary List all products
+// @Description Get products with pagination and filtering
+// @Tags Products
+// @Produce json
+// @Param page query int false "Page number" default(1)
+// @Param limit query int false "Items per page" default(10)
+// @Param category_id query int false "Filter by category ID"
+// @Param search query string false "Search by name"
+// @Param min_price query number false "Minimum price"
+// @Param max_price query number false "Maximum price"
+// @Param rating query number false "Minimum rating"
+// @Param sort query string false "Sort order"
+// @Success 200 {array} map[string]interface{}
+// @Router /products [get]
 func (h *ProductHandler) GetProducts(ctx *gin.Context) {
 	classify := ctx.Query(constants.ClassifyParam)
 	search := ctx.Query(constants.SearchParam)
@@ -168,6 +229,15 @@ func (h *ProductHandler) GetProducts(ctx *gin.Context) {
 	ResponseSuccess(ctx, http.StatusOK, products)
 }
 
+// GetProductByID godoc
+// @Summary Get product by ID
+// @Description Get product details by ID
+// @Tags Products
+// @Produce json
+// @Param id path int true "Product ID"
+// @Success 200 {object} map[string]interface{}
+// @Failure 404 "Product not found"
+// @Router /products/{id} [get]
 func (h *ProductHandler) GetProductByID(ctx *gin.Context) {
 	id, err := GetIDParam(ctx)
 	if err != nil {

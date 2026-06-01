@@ -17,6 +17,19 @@ func NewRatingHandler(service services.RatingService) *RatingHandler {
 	return &RatingHandler{service: service}
 }
 
+// CreateRating godoc
+// @Summary Create rating for product
+// @Description Add a rating/review for a product
+// @Tags Ratings
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "Product ID"
+// @Param body body requests.CreateRatingRequest true "Rating data"
+// @Success 201 {object} map[string]interface{}
+// @Failure 400 "Invalid request"
+// @Failure 401 "Unauthorized"
+// @Router /products/{id}/rating [post]
 func (h *RatingHandler) CreateRating(ctx *gin.Context) {
 	userID := ctx.MustGet(constants.UserID).(uint)
 
@@ -41,6 +54,17 @@ func (h *RatingHandler) CreateRating(ctx *gin.Context) {
 
 }
 
+// GetRatingByID godoc
+// @Summary Get user's rating for product
+// @Description Get the authenticated user's rating for a specific product
+// @Tags Ratings
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "Product ID"
+// @Success 200 {object} map[string]interface{}
+// @Failure 401 "Unauthorized"
+// @Failure 404 "Rating not found"
+// @Router /products/{id}/rating [get]
 func (h *RatingHandler) GetRatingByID(ctx *gin.Context) {
 	userID := ctx.MustGet(constants.UserID).(uint)
 	productID, err := GetIDParam(ctx)
@@ -58,6 +82,17 @@ func (h *RatingHandler) GetRatingByID(ctx *gin.Context) {
 	ResponseSuccess(ctx, http.StatusOK, rating)
 }
 
+// GetRatingsByUserID godoc
+// @Summary Get user's ratings
+// @Description Get all ratings/reviews submitted by the authenticated user
+// @Tags Ratings
+// @Produce json
+// @Security BearerAuth
+// @Param page query int false "Page number" default(1)
+// @Param limit query int false "Items per page" default(10)
+// @Success 200 {array} map[string]interface{}
+// @Failure 401 "Unauthorized"
+// @Router /products/ratings [get]
 func (h *RatingHandler) GetRatingsByUserID(ctx *gin.Context) {
 	userID := ctx.MustGet(constants.UserID).(uint)
 

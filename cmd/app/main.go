@@ -3,6 +3,7 @@ package main
 import (
 	"food_delivery/internal/configs"
 	"food_delivery/internal/handlers"
+	"food_delivery/internal/middlewares"
 	"food_delivery/internal/repositories"
 	"food_delivery/internal/routes"
 	"food_delivery/internal/services"
@@ -11,9 +12,22 @@ import (
 	"net/http"
 	"os"
 
+	_ "food_delivery/docs"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
+
+// @title Food Delivery API
+// @version 1.0
+// @description A RESTful API for a food delivery application
+// @host localhost:8080
+// @basePath /api
+// @schemes http https
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
 
 func main() {
 	if err := godotenv.Load(); err != nil {
@@ -55,8 +69,11 @@ func main() {
 	}
 
 	r := gin.Default()
+	r.Use(middlewares.RequestLogger())
 
 	r.Static("/uploads", "./uploads")
+
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	api := r.Group("/api")
 	{
