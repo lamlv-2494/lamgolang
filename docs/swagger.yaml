@@ -1,0 +1,1000 @@
+basePath: /api
+definitions:
+  requests.AddToCartRequest:
+    properties:
+      product_id:
+        type: integer
+      quantity:
+        type: integer
+    required:
+    - product_id
+    - quantity
+    type: object
+  requests.AdminUpdateUserRequest:
+    properties:
+      user:
+        properties:
+          email:
+            type: string
+          role:
+            type: string
+          username:
+            type: string
+        type: object
+    type: object
+  requests.CreateCategoryRequest:
+    properties:
+      description:
+        type: string
+      name:
+        type: string
+    required:
+    - name
+    type: object
+  requests.CreateRatingRequest:
+    properties:
+      comment:
+        maxLength: 500
+        type: string
+      stars:
+        maximum: 5
+        minimum: 1
+        type: integer
+    required:
+    - stars
+    type: object
+  requests.CreateSuggestionRequest:
+    properties:
+      description:
+        type: string
+      title:
+        type: string
+    required:
+    - description
+    - title
+    type: object
+  requests.LoginRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  requests.RegisterRequest:
+    properties:
+      user:
+        properties:
+          email:
+            type: string
+          password:
+            minLength: 6
+            type: string
+          username:
+            type: string
+        required:
+        - email
+        - password
+        - username
+        type: object
+    type: object
+  requests.UpdateCartItemRequest:
+    properties:
+      quantity:
+        type: integer
+    required:
+    - quantity
+    type: object
+  requests.UpdateCategoryRequest:
+    properties:
+      description:
+        type: string
+      name:
+        type: string
+    type: object
+  requests.UpdateOrderStatusRequest:
+    properties:
+      status:
+        enum:
+        - pending
+        - processing
+        - delivering
+        - completed
+        - cancelled
+        type: string
+    required:
+    - status
+    type: object
+  requests.UpdateUserRequest:
+    properties:
+      user:
+        properties:
+          email:
+            type: string
+          password:
+            type: string
+          username:
+            type: string
+        type: object
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: A RESTful API for a food delivery application
+  title: Food Delivery API
+  version: "1.0"
+paths:
+  /admin/categories:
+    post:
+      consumes:
+      - application/json
+      description: Create a new category (Admin only)
+      parameters:
+      - description: Category data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/requests.CreateCategoryRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid request
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+      security:
+      - BearerAuth: []
+      summary: Create category (Admin only)
+      tags:
+      - Admin - Categories
+  /admin/categories/{id}:
+    delete:
+      description: Delete a category (Admin only)
+      parameters:
+      - description: Category ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Category deleted
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+      security:
+      - BearerAuth: []
+      summary: Delete category (Admin only)
+      tags:
+      - Admin - Categories
+    put:
+      consumes:
+      - application/json
+      description: Update a category (Admin only)
+      parameters:
+      - description: Category ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Updated category data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/requests.UpdateCategoryRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid request
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+      security:
+      - BearerAuth: []
+      summary: Update category (Admin only)
+      tags:
+      - Admin - Categories
+  /admin/orders:
+    get:
+      description: Get all orders with pagination (Admin only)
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              additionalProperties: true
+              type: object
+            type: array
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+      security:
+      - BearerAuth: []
+      summary: Get all orders (Admin only)
+      tags:
+      - Admin - Orders
+  /admin/orders/{id}/status:
+    put:
+      consumes:
+      - application/json
+      description: Update the status of an order (Admin only)
+      parameters:
+      - description: Order ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Order status data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/requests.UpdateOrderStatusRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid request
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+      security:
+      - BearerAuth: []
+      summary: Update order status (Admin only)
+      tags:
+      - Admin - Orders
+  /admin/products:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Create a new product (Admin only)
+      parameters:
+      - description: Product name
+        in: formData
+        name: name
+        required: true
+        type: string
+      - description: Product description
+        in: formData
+        name: description
+        type: string
+      - description: Product price
+        in: formData
+        name: price
+        required: true
+        type: number
+      - description: Category ID
+        in: formData
+        name: category_id
+        required: true
+        type: integer
+      - description: Product image
+        in: formData
+        name: image
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid request
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+      security:
+      - BearerAuth: []
+      summary: Create product (Admin only)
+      tags:
+      - Admin - Products
+  /admin/products/{id}:
+    delete:
+      description: Delete a product (Admin only)
+      parameters:
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Product deleted
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+      security:
+      - BearerAuth: []
+      summary: Delete product (Admin only)
+      tags:
+      - Admin - Products
+    put:
+      consumes:
+      - multipart/form-data
+      description: Update a product (Admin only)
+      parameters:
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Product name
+        in: formData
+        name: name
+        type: string
+      - description: Product description
+        in: formData
+        name: description
+        type: string
+      - description: Product price
+        in: formData
+        name: price
+        type: number
+      - description: Category ID
+        in: formData
+        name: category_id
+        type: integer
+      - description: Product image
+        in: formData
+        name: image
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid request
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+      security:
+      - BearerAuth: []
+      summary: Update product (Admin only)
+      tags:
+      - Admin - Products
+  /admin/suggestions:
+    get:
+      description: Get all submitted suggestions (Admin only)
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              additionalProperties: true
+              type: object
+            type: array
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+      security:
+      - BearerAuth: []
+      summary: Get all suggestions (Admin only)
+      tags:
+      - Admin - Suggestions
+  /admin/users:
+    get:
+      description: Get all users with pagination (Admin only)
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              additionalProperties: true
+              type: object
+            type: array
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+      security:
+      - BearerAuth: []
+      summary: Get all users
+      tags:
+      - Admin - Users
+  /admin/users/{id}:
+    delete:
+      description: Delete a user (Admin only)
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User deleted
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+      security:
+      - BearerAuth: []
+      summary: Delete user (Admin only)
+      tags:
+      - Admin - Users
+    put:
+      consumes:
+      - application/json
+      description: Update any user profile (Admin only)
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: User update data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/requests.AdminUpdateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User updated
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+      security:
+      - BearerAuth: []
+      summary: Update user (Admin only)
+      tags:
+      - Admin - Users
+  /cart:
+    get:
+      description: Get the current user's shopping cart
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              additionalProperties: true
+              type: object
+            type: array
+        "401":
+          description: Unauthorized
+      security:
+      - BearerAuth: []
+      summary: Get user cart
+      tags:
+      - Cart
+    post:
+      consumes:
+      - application/json
+      description: Add a product to user's cart
+      parameters:
+      - description: Cart item data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/requests.AddToCartRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid request
+        "401":
+          description: Unauthorized
+      security:
+      - BearerAuth: []
+      summary: Add item to cart
+      tags:
+      - Cart
+  /cart/{id}:
+    delete:
+      description: Remove a product from user's cart
+      parameters:
+      - description: Cart item ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Item removed from cart
+        "401":
+          description: Unauthorized
+      security:
+      - BearerAuth: []
+      summary: Remove item from cart
+      tags:
+      - Cart
+    put:
+      consumes:
+      - application/json
+      description: Update the quantity of an item in user's cart
+      parameters:
+      - description: Cart item ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Updated cart item data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/requests.UpdateCartItemRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid request
+        "401":
+          description: Unauthorized
+      security:
+      - BearerAuth: []
+      summary: Update cart item quantity
+      tags:
+      - Cart
+  /categories:
+    get:
+      description: Get all categories with pagination
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              additionalProperties: true
+              type: object
+            type: array
+      summary: List all categories
+      tags:
+      - Categories
+  /orders:
+    get:
+      description: Get orders of the authenticated user
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              additionalProperties: true
+              type: object
+            type: array
+        "401":
+          description: Unauthorized
+      security:
+      - BearerAuth: []
+      summary: Get user order history
+      tags:
+      - Orders
+    post:
+      description: Create an order from user's cart
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid request
+        "401":
+          description: Unauthorized
+      security:
+      - BearerAuth: []
+      summary: Create order (checkout)
+      tags:
+      - Orders
+  /products:
+    get:
+      description: Get products with pagination and filtering
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      - description: Filter by category ID
+        in: query
+        name: category_id
+        type: integer
+      - description: Search by name
+        in: query
+        name: search
+        type: string
+      - description: Minimum price
+        in: query
+        name: min_price
+        type: number
+      - description: Maximum price
+        in: query
+        name: max_price
+        type: number
+      - description: Minimum rating
+        in: query
+        name: rating
+        type: number
+      - description: Sort order
+        in: query
+        name: sort
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              additionalProperties: true
+              type: object
+            type: array
+      summary: List all products
+      tags:
+      - Products
+  /products/{id}:
+    get:
+      description: Get product details by ID
+      parameters:
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Product not found
+      summary: Get product by ID
+      tags:
+      - Products
+  /products/{id}/rating:
+    get:
+      description: Get the authenticated user's rating for a specific product
+      parameters:
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+        "404":
+          description: Rating not found
+      security:
+      - BearerAuth: []
+      summary: Get user's rating for product
+      tags:
+      - Ratings
+    post:
+      consumes:
+      - application/json
+      description: Add a rating/review for a product
+      parameters:
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Rating data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/requests.CreateRatingRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid request
+        "401":
+          description: Unauthorized
+      security:
+      - BearerAuth: []
+      summary: Create rating for product
+      tags:
+      - Ratings
+  /products/ratings:
+    get:
+      description: Get all ratings/reviews submitted by the authenticated user
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              additionalProperties: true
+              type: object
+            type: array
+        "401":
+          description: Unauthorized
+      security:
+      - BearerAuth: []
+      summary: Get user's ratings
+      tags:
+      - Ratings
+  /suggestions:
+    post:
+      consumes:
+      - application/json
+      description: Submit a suggestion or feedback
+      parameters:
+      - description: Suggestion data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/requests.CreateSuggestionRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid request
+        "401":
+          description: Unauthorized
+      security:
+      - BearerAuth: []
+      summary: Create a suggestion
+      tags:
+      - Suggestions
+  /user:
+    get:
+      description: Get the profile of the authenticated user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+      security:
+      - BearerAuth: []
+      summary: Get current user profile
+      tags:
+      - User
+    put:
+      consumes:
+      - application/json
+      description: Update the profile of the authenticated user
+      parameters:
+      - description: Updated user data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/requests.UpdateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+      security:
+      - BearerAuth: []
+      summary: Update current user profile
+      tags:
+      - User
+  /user/login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticate user and receive JWT token
+      parameters:
+      - description: Login credentials
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/requests.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+      summary: Login user
+      tags:
+      - Auth
+  /user/register:
+    post:
+      consumes:
+      - application/json
+      description: Create a new user account
+      parameters:
+      - description: User registration data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/requests.RegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid request
+      summary: Register a new user
+      tags:
+      - Auth
+schemes:
+- http
+- https
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
